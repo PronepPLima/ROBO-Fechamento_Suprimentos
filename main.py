@@ -15,15 +15,11 @@ imagem_redimencionada = imagem_original.resize((largura,altura))
 
 def UploadAction(event=None):
     filename = filedialog.askopenfilename()
-    print('Selecionado: ' , filename)
-    #lb_console = tk.Label(root, text=filename)
-    #lb_console.pack(fill="both" , expand=True , pady=10)
-    
+    print(f"Endereco do arquivo: {filename}")
     #apos o click, exibicao do endereco do arquivo em console:
     display_file_path(filename)   
     
 def display_file_path(file_path):
-    print(f"Endereco do arquivo: {file_path}")
     label_file_path.config(text=file_path)
 
 
@@ -42,19 +38,20 @@ if __name__ == "__main__":
     lb_barra_superior = tk.Label(root, image=imagem_tk , border =0)
     lb_barra_superior.pack()
     
+    #botão de chose file:
     bt_choseFile = tk.Button(root, text="Escolher arquivo" , command=UploadAction)
     bt_choseFile.pack()
+    
+    #abrir arquivo selecionado
+    
+    #abrir planilha csv com fechamento do mes selecionado
     
     label_file_path = tk.Label(root,text='',border =0)
     label_file_path.pack()
     
     root.mainloop()
     
-    #abrir pasta arquivos, que fica na pasta da instalacao do app
-    
-    #to do: criar interface gráfica com botão de chose file
-    
-    #abrir planilha csv com fechamento do mes selecionado
+
     
     
     
