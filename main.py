@@ -30,12 +30,36 @@ Unidade = ''
 
 def Seleciona_query_List(opcao):
     print(f'Opcao selecionado: {opcao}')
+    
+    #TODO: verificar se é RJ e executar a funcao que chama o lista do RJ:
+    
+    if opcao=="IW_ES":
+        print(f'Opcao escolhida: {opcao}')
+        es_fech_esto_V2_lista()
+    elif opcao=="IW_RJ":
+        print(f'Opcao escolhida: {opcao}')
+        rj_fech_esto_V2_lista()
+    elif opcao=="IW_SP":
+        print(f'Opcao escolhida: {opcao}')
+        sp_fech_esto_V2_lista()
+    else:
+        print(f'Opcao Invalida!!!')
 
-
+def es_fech_esto_V2_lista():
+    th_es_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_es_lista()).start()
+    th_es_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Lista.xlsx')
+    label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
+    
 def rj_fech_esto_V2_lista():
     th_rj_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_rj_lista()).start()
     th_rj_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Lista.xlsx')
     label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
+    
+    #TODO: puxar list de Sao Paulo:
+def sp_fech_esto_V2_lista():
+    th_sp_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_sp_lista()).start()
+    th_sp_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Lista.xlsx')
+    label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
     
     
 def rj_fech_esto_V2_detalhado(id):   
@@ -69,17 +93,17 @@ if __name__ == "__main__":
         opcao_var = tk.StringVar()
         opcao_var.set("Nenhuma opcao!")
     
-        radio_es = tk.Radiobutton(root ,text="IW ES", variable=opcao_var, value='IW_ES' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}')])
+        radio_es = tk.Radiobutton(root ,text="IW ES", variable=opcao_var, value='IW_ES' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}'), Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_es.pack()
         
-        radio_rj = tk.Radiobutton(root ,text="IW RJ", variable=opcao_var, value='IW_RJ' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
+        radio_rj = tk.Radiobutton(root ,text="IW RJ", variable=opcao_var , value='IW_RJ' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_rj.pack()
     
-        radio_sp = tk.Radiobutton(root ,text="IW SP", variable=opcao_var, value='IW_SP' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}')])
+        radio_sp = tk.Radiobutton(root ,text="IW SP", variable=opcao_var, value='IW_SP' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}'), Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_sp.pack()
         
         #botao para exibicao de lista de fechamentos:
-        bt_list_V2_fech_esto_RJ = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [print('botao bt_list_V2_fech_esto_RJ!!!!') , rj_fech_esto_V2_lista() ])
+        bt_list_V2_fech_esto_RJ = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [Unidade:=opcao_var.get() , print(f'botao bt_list_V2_fech_esto: {Unidade}') , Seleciona_query_List(Unidade) ])
         bt_list_V2_fech_esto_RJ.pack(pady=10)
         
         label_file_lista = tk.Label(root,text='',border =0)
