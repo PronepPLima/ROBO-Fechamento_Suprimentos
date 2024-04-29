@@ -9,7 +9,9 @@ import pandas as pd
 import numpy as py
 import warnings
 from pandastable import Table
-from conect_BD import v2_connection_rj
+#from conect_BD import v2_connection_rj
+from conect_BD import Conect_bd
+
 import threading
 
 #ignorando alertas exibidos:
@@ -26,13 +28,20 @@ imagem_redimencionada = imagem_original.resize((largura,altura))
     
 def rj_fech_esto_V2(id):   
     #retornara um data frame com os dados da query:   
-    th_rj_fech_esto_V2 = threading.Thread(target=v2_connection_rj(id)).start()
+    th_rj_fech_esto_V2 = threading.Thread(target=Conect_bd.v2_connection_rj(id)).start()
     
-    print(f'{th_rj_fech_esto_V2}')
+    print(f'THREAD: th_rj_fech_esto_V2\n{th_rj_fech_esto_V2}')
     
     #label_file_dados.config(text=v2_connection_rj(id))
+    
+    #todo: ler arquivo xlsx criado
+    
+    #todo: montar um data frame 
+    
+    #todo: montar esse data frame na label abaixo
     label_file_dados.config(text="Teste")
     label_file_dados.pack(pady=10)
+    
         
 
 #============================================================ EXECUCAO ============================================================
