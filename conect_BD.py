@@ -15,8 +15,14 @@ password = 'Pronasis1508'
 
 class Conect_bd:
     
+    def to_string(self , df):
+        print(f'to_string(df)\n{df}')
+        #self.str = ""
+        #self.str = df
+        #return str
+
     
-    def v2_connection_rj(id):
+    def v2_connection_rj_detalhado(id):
         connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
         connection.current_schema = "IW_PROD_RJ"
         print(f'connection.current_schema = "IW_PROD_RJ"')
@@ -25,14 +31,14 @@ class Conect_bd:
         print(f'{database}')
         print(f'{username}')
         print(f'{password}')
-        
+
         print(f"connection: {connection}\nSuccessfully connected to Oracle Database")
-    
+
         #ID = 44
-    
+
         # Consulta SQL
         cursor = connection.cursor()
-                
+
         query = """
                             SELECT
                                 --add manualmente a essa query o ID
@@ -193,22 +199,14 @@ class Conect_bd:
                                 AND F.ID = 1 
                             ORDER BY f.name, e.name
         """
-        
+
         #cursor.execute(query)
-        
+
         #exibindo no console:
         #for row in cursor.execute(query):
         #    print(row)
-        
+
         #print("============================= results =========================================")
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-        data_frame.to_excel('IW_PROD_RJ_Resultado.xlsx' , index=False)
-        print(f'\nDataframe:\n{data_frame}')
-        #return data_frame
-        
-        
-        
-        def to_string():
-            str = ""
-            return str
+        data_frame.to_excel('arquivos\IW_PROD_RJ_Resultado.xlsx' , index=False)

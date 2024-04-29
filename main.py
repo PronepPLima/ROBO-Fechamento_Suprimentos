@@ -26,20 +26,13 @@ altura=140
 imagem_redimencionada = imagem_original.resize((largura,altura))
     
     
-def rj_fech_esto_V2(id):   
+def rj_fech_esto_V2_detalhado(id):   
     #retornara um data frame com os dados da query:   
-    th_rj_fech_esto_V2 = threading.Thread(target=Conect_bd.v2_connection_rj(id)).start()
-    
-    print(f'THREAD: th_rj_fech_esto_V2\n{th_rj_fech_esto_V2}')
-    
-    #label_file_dados.config(text=v2_connection_rj(id))
-    
-    #todo: ler arquivo xlsx criado
-    
-    #todo: montar um data frame 
-    
-    #todo: montar esse data frame na label abaixo
-    label_file_dados.config(text="Teste")
+    th_rj_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_rj_detalhado(id)).start()
+          
+    #ler arquivo xlsx criado e exibir na label:
+    th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
+    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado_XLSX.head(10))
     label_file_dados.pack(pady=10)
     
         
@@ -63,7 +56,7 @@ if __name__ == "__main__":
         #botao para V2_fech_esto_RJ
         id = 44
         
-        bt_V2_fech_esto_RJ = tk.Button(root, text="Fechamento V2 - RJ" , command=lambda: [print('Acao do botao RJ!!!!') , rj_fech_esto_V2(id) ])
+        bt_V2_fech_esto_RJ = tk.Button(root, text="Fechamento V2 - RJ" , command=lambda: [print('Acao do botao RJ!!!!') , rj_fech_esto_V2_detalhado(id) ])
         bt_V2_fech_esto_RJ.pack(pady=10 ) 
         
         #TO DO: exibindo em tela :
