@@ -13,6 +13,9 @@ database = 'pronep'
 username = 'SYSTEM'
 password = 'Pronasis1508'
 
+connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
+connection.current_schema = "IW_PROD_RJ"
+
 class Conect_bd:
     
     def to_string(self , df):
@@ -20,21 +23,37 @@ class Conect_bd:
         #self.str = ""
         #self.str = df
         #return str
+        
+    def v2_connection_rj_lista():
+        print(f'connection.current_schema = "IW_PROD_RJ"')
+        print("\n============================== v2_connection_rj_lista ========================")
+        print(f"connection: {connection}\nSuccessfully connected to Oracle Database")
+        
+        cursor = connection.cursor()
+        
+        query = """
+                        select 
+                            A.ID,
+                            A.DATAT0 AS DT_INICIO ,
+                            A.DATATF - 1 AS DT_FIM
+                        from IW_PROD_RJ.TD_ICW_FECH_EST_C8 A
+                        where A.id>0 
+                        --and (A.DATATF >=  to_date( '01/01/2024','dd/mm/yyyy hh24:mi:ss' ) 
+                        --and A.DATATF <=  to_date( '01/05/2024','dd/mm/yyyy hh24:mi:ss' )) 
+                        order by A.ID desc
+        
+                """
+        results = cursor.execute(query)
+        data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+        data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
+        
+        
 
     
     def v2_connection_rj_detalhado(id):
-        connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
-        connection.current_schema = "IW_PROD_RJ"
         print(f'connection.current_schema = "IW_PROD_RJ"')
-        print("\n============================== inicio ========================")
-        print(f'{server}')
-        print(f'{database}')
-        print(f'{username}')
-        print(f'{password}')
-
+        print("\n============================== v2_connection_rj_detalhado ========================")
         print(f"connection: {connection}\nSuccessfully connected to Oracle Database")
-
-        #ID = 44
 
         # Consulta SQL
         cursor = connection.cursor()
