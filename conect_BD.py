@@ -51,7 +51,7 @@ class Conect_bd:
 
     
     def v2_connection_rj_detalhado(id):
-        print(f'connection.current_schema = "IW_PROD_RJ"')
+        print(f'connection.current_schema = "IW_PROD_RJ"\ncom id:{id}')
         print("\n============================== v2_connection_rj_detalhado ========================")
         print(f"connection: {connection}\nSuccessfully connected to Oracle Database")
 
@@ -226,6 +226,8 @@ class Conect_bd:
         #    print(row)
 
         #print("============================= results =========================================")
+        id = id
+        print(f'************************** {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
         data_frame.to_excel('arquivos\IW_PROD_RJ_Resultado.xlsx' , index=False)
