@@ -5,14 +5,12 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 from tkinter import filedialog
-
 import pandas as pd
 import numpy as py
-
 import warnings
-
-
 from pandastable import Table
+from conect_BD import v2_connection_rj
+import threading
 
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
@@ -21,51 +19,21 @@ warnings.filterwarnings("ignore")
 imagem_original = Image.open("LOGO_PRETA.png")
 largura=300
 altura=140
+
 #redimencionando a imagem:
 imagem_redimencionada = imagem_original.resize((largura,altura))
-
-    
-
-def UploadAction(event=None):
-    filename = filedialog.askopenfilename()
-    print(f"Endereco do arquivo: {filename}\n")
-    
-    #apos o click, exibicao do endereco do arquivo em console:
-    label_file_path.config(text=filename , width=100 , height=1)
-    label_file_path.pack(pady=10)
-    
-    #B) Abrir planilha xlsx e exibir em tela:
-    
-    #TO DO: refatorar linha abaixo, pois ela se trata exclusivamente de teste:
-    #data_frame = pd.read_excel('C:/Pietro/Projetos/ROBO-Fechamento_Suprimentos/arquivos/Fechamento Estoque v2 - para export 01012024 ate 31012024 000.xlsx',index_col=None)
-    
-    #TO DO: linha abaixo importa o data frame corretamente:
-    data_frame = pd.read_excel(filename)
-    print(f'#Default:\nData Frame:\n{data_frame.head(10)}\n')
-    
-    #EXIBINDO EN CONSOLE:    
-    #exibindo o index do data frame:
-    #print(f'Data frame index():\n{data_frame.index}\n')
-    
-    #exibindo informacao do data_frame:
-    #print(f'\nData Frame info():\n{data_frame.info()}\n\n')
-    
-    #exibindo a descricao do data frame:
-    #print(f'Data Frame describe():\n{data_frame.describe()}\n')
     
     
-    #apagando a primeira linha abaixo do titulo:
-    #data_frame = data_frame.dropna(axis=0, how='all')
+def rj_fech_esto_V2(id):   
+    #retornara um data frame com os dados da query:   
+    th_rj_fech_esto_V2 = threading.Thread(target=v2_connection_rj(id)).start()
     
-    #Exibindo colunas específicas:
-    #selected_columns = ['COD_MATERIAL','NOME_MATERIAL','QTDE_SALDO_INIC']
-    #print(f'\nColunas Selecionadas:\n{data_frame[selected_columns]}')
+    print(f'{th_rj_fech_esto_V2}')
     
-    #exibicao do data frame na tela:
-    #label_file_dados.config(text=data_frame[[ 'COD_MATERIAL', 'NOME_MATERIAL','VALOR_FINAL', 'VALOR_E_TOTAL' , 'VALOR_S_TOTAL']].iloc[1:99999999])
-    label_file_dados.config(text=data_frame)
+    #label_file_dados.config(text=v2_connection_rj(id))
+    label_file_dados.config(text="Teste")
     label_file_dados.pack(pady=10)
-    
+        
 
 #============================================================ EXECUCAO ============================================================
 if __name__ == "__main__":
@@ -74,7 +42,6 @@ if __name__ == "__main__":
 
         #montar interface gráfica:
         root = tk.Tk()
-        #root.maxsize(800,600)
         root.geometry("1024x800")
         root.maxsize(1024,1024)
         root.title("ROBO - Fechamento Suprimentos 1.0")
@@ -84,27 +51,15 @@ if __name__ == "__main__":
         lb_barra_superior = tk.Label(root, image=imagem_tk , border =0)
         lb_barra_superior.pack()
 
-        #exibindo em tela o endereco do arquivo selecionado no botao chosefile:
-        label_file_path = tk.Label(root,text='',border =0 , width=100 , height=1)
-        label_file_path.pack(pady=10)
+        #botao para V2_fech_esto_RJ
+        id = 44
         
-        #botão de chose file:
-        bt_choseFile = tk.Button(root, text="Arquivo" , command=UploadAction)
-        bt_choseFile.pack(pady=10 ) 
+        bt_V2_fech_esto_RJ = tk.Button(root, text="Fechamento V2 - RJ" , command=lambda: [print('Acao do botao RJ!!!!') , rj_fech_esto_V2(id) ])
+        bt_V2_fech_esto_RJ.pack(pady=10 ) 
         
-        #exibindo o número de páginas do pdf:
-        #label_file_num_pag = tk.Label(root,text='',border =0)
-
-        #TO DO: exibindo em tela pdf com fechamento do mes selecionado:
+        #TO DO: exibindo em tela :
         label_file_dados = tk.Label(root,text='',border =0)
         
-        """
-        text_widget = tk.Text(root)
-        
-        frame = tk.Frame(root)
-        frame.pack()
-        """
-
         root.mainloop()
         print("\n============================== fim ========================")
     
