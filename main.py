@@ -68,7 +68,7 @@ def es_fech_esto_V2_lista():
     th_es_fech_esto_V2_lista_XLSX = th_es_fech_esto_V2_lista_XLSX
     th_es_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_es_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_es_fech_esto_V2_lista_XLSX['DT_FIM'] = th_es_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame temp:\n{th_es_fech_esto_V2_lista_XLSX.info()}')
+    print(f'\n\n Data frame th_es_fech_esto_V2_lista_XLSX:\n{th_es_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
     
 def rj_fech_esto_V2_lista():
@@ -78,7 +78,7 @@ def rj_fech_esto_V2_lista():
     th_rj_fech_esto_V2_lista_XLSX = th_rj_fech_esto_V2_lista_XLSX
     th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_rj_fech_esto_V2_lista_XLSX['DT_FIM'] = th_rj_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame temp:\n{th_rj_fech_esto_V2_lista_XLSX.info()}')
+    print(f'\n\n Data frame th_rj_fech_esto_V2_lista_XLSX:\n{th_rj_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX[['ID','DT_INICIO','DT_FIM']].head(5).to_string(index=False))
     
 def sp_fech_esto_V2_lista():
@@ -88,7 +88,7 @@ def sp_fech_esto_V2_lista():
     th_sp_fech_esto_V2_lista_XLSX = th_sp_fech_esto_V2_lista_XLSX
     th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_sp_fech_esto_V2_lista_XLSX['DT_FIM'] = th_sp_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame temp:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
+    print(f'\n\n Data frame th_sp_fech_esto_V2_lista_XLSX:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
 
    
@@ -100,10 +100,71 @@ def es_fech_esto_V2_detalhado(id):
     #ler arquivo xlsx criado e exibir na label:
     th_es_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Resultado.xlsx')
     print(th_es_fech_esto_V2_detalhado_XLSX.info())
-
+   
+    #th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
+    #print(f'Data frame apos o XLSX:\n{th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False)}\n\n')
+    
+    """
+    th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['TIPOMATERIAL' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
+    print(f'Data frame apos o XLSX:\n{th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False)}\n\n')
+    
+    #trazendo os valores distintos das dietas:
+    dietas_distintas = th_es_fech_esto_V2_detalhado_XLSX['TIPOMATERIAL'].unique()
+    print(f'valores distintos das dietas: {dietas_distintas}')
+    
+    #Separando as dietas:
+    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')
+    print(f'Sub total dietas inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
+    print(f'Sub total dietas final: {todas_as_dietas["VALOR_FINAL"].sum()}')
+    
+    #separando Mat. Enfermagem:
+    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')
+    print(f'Sub total Mat. Enfermagem inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
+    print(f'Sub total Mat. Enfermagem final: {todas_as_dietas["VALOR_FINAL"].sum()}')
+    
+    #separando Materiais Diversos:
+    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')
+    print(f'Sub total Materiais Diversos inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
+    print(f'Sub total Materiais Diversos final: {todas_as_dietas["VALOR_FINAL"].sum()}')
+        
+    #separando Medicamentos:
+    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')
+    print(f'Sub total Medicamentos inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
+    print(f'Sub total Medicamentos final: {todas_as_dietas["VALOR_FINAL"].sum()}')    
+    
+    print('\n')
+    #somando todos os VALOR_INIC das dietas:
+    print(f'Total estoque inicial: {th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum()}')
+    
+    #somando todos os VALOR_FINAL das dietas:
+    print(f'Total estoque final: {th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()}')
+    
+    """
+    
+    #resultados inseridos num array:
+    sub_totais = {
+                    'Sub total dietas inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                    'Sub total dietas final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                    'Sub total Mat. Enfermagem inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                    'Sub total Mat. Enfermagem final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                    'Sub total Materiais Diversos inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                    'Sub total Materiais Diversos final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                    'Sub total Medicamentos inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                    'Sub total Medicamentos final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                    'Total estoque inicial' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
+                    'Total estoque final' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
+                }
+    print(f'\n\nDicionario com resultados:\n{sub_totais}')
+    
+    #resultados inseridos em um data frame:
+    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=['Valor'])
+    print(f'\nResultados:\n{df_resultados.info}')   
+    
     #exibindo o data frame na tela:
-    th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
     label_file_dados.config(text=th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
+    
+    #TODO: refatorar
+    label_file_dados.config(text=df_resultados)
 
 
     
