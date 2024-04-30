@@ -11,8 +11,8 @@ import warnings
 from pandastable import Table
 #from conect_BD import v2_connection_rj_detalhado
 from conect_BD import Conect_bd
-
 import threading
+import pyautogui
 
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
@@ -48,19 +48,34 @@ def Seleciona_query_List(opcao):
 def es_fech_esto_V2_lista():
     th_es_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_es_lista()).start()
     th_es_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Lista.xlsx')
+    #FORMATANDO DATA:
+    th_es_fech_esto_V2_lista_XLSX = th_es_fech_esto_V2_lista_XLSX
+    th_es_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_es_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
+    th_es_fech_esto_V2_lista_XLSX['DT_FIM'] = th_es_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
+    print(f'\n\n Data frame temp:\n{th_es_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
     
 def rj_fech_esto_V2_lista():
     th_rj_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_rj_lista()).start()
     th_rj_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Lista.xlsx')
-    label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
+    #FORMATANDO DATA:
+    th_rj_fech_esto_V2_lista_XLSX = th_rj_fech_esto_V2_lista_XLSX
+    th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
+    th_rj_fech_esto_V2_lista_XLSX['DT_FIM'] = th_rj_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
+    print(f'\n\n Data frame temp:\n{th_rj_fech_esto_V2_lista_XLSX.info()}')
+    label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX[['ID','DT_INICIO','DT_FIM']].head(5).to_string(index=False))
     
-    #TODO: puxar list de Sao Paulo:
 def sp_fech_esto_V2_lista():
     th_sp_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_sp_lista()).start()
     th_sp_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Lista.xlsx')
+    #FORMATANDO DATA:
+    th_sp_fech_esto_V2_lista_XLSX = th_sp_fech_esto_V2_lista_XLSX
+    th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
+    th_sp_fech_esto_V2_lista_XLSX['DT_FIM'] = th_sp_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
+    print(f'\n\n Data frame temp:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
     
+#TODO: puxar detalhado do ES:
     
 def rj_fech_esto_V2_detalhado(id):   
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
@@ -69,7 +84,14 @@ def rj_fech_esto_V2_detalhado(id):
           
     #ler arquivo xlsx criado e exibir na label:
     th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
+    print(th_rj_fech_esto_V2_detalhado_XLSX.info())
+    
+#TODO: puxar detalhado do SP:
+    
+    
+    #exibindo o data frame na tela:
     label_file_dados.config(text=th_rj_fech_esto_V2_detalhado_XLSX.head(5))
+    pyautogui.alert("XLSX detalhado finalizado com sucesso!" )
     
         
 
