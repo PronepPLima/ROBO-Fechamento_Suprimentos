@@ -44,6 +44,22 @@ def Seleciona_query_List(opcao):
         sp_fech_esto_V2_lista()
     else:
         print(f'Opcao Invalida!!!')
+        
+def Seleciona_query_Detalhe(opcao , id_fech):
+    print(f'========= Seleciona_query_Detalhe\n')
+    
+    if opcao=="IW_ES":
+        print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
+        es_fech_esto_V2_detalhado(id_fech)
+    elif opcao=="IW_RJ":
+        print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
+        rj_fech_esto_V2_detalhado(id_fech)
+    elif opcao=="IW_SP":
+        print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
+        sp_fech_esto_V2_detalhado(id_fech)
+    else:
+        print(f'Opcao Invalida!!!')
+    
 
 def es_fech_esto_V2_lista():
     th_es_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_es_lista()).start()
@@ -74,24 +90,47 @@ def sp_fech_esto_V2_lista():
     th_sp_fech_esto_V2_lista_XLSX['DT_FIM'] = th_sp_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
     print(f'\n\n Data frame temp:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
     label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
-    
+
+   
 #TODO: puxar detalhado do ES:
+def es_fech_esto_V2_detalhado(id):   
+    print(f"************* es_fech_esto_V2_detalhado -> {id}")
+    #retornara um data frame com os dados da query:   
+    th_es_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_es_detalhado(id)).start()
+    #ler arquivo xlsx criado e exibir na label:
+    th_es_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Resultado.xlsx')
+    print(th_es_fech_esto_V2_detalhado_XLSX.info())
+
+    #exibindo o data frame na tela:
+    th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
+    label_file_dados.config(text=th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
+
+
     
 def rj_fech_esto_V2_detalhado(id):   
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
     #retornara um data frame com os dados da query:   
     th_rj_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_rj_detalhado(id)).start()
-          
     #ler arquivo xlsx criado e exibir na label:
     th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
     print(th_rj_fech_esto_V2_detalhado_XLSX.info())
     
-#TODO: puxar detalhado do SP:
+    #exibindo o data frame na tela:
+    th_rj_fech_esto_V2_detalhado_XLSX = th_rj_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
+    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
     
+    
+def sp_fech_esto_V2_detalhado(id):   
+    print(f"************* sp_fech_esto_V2_detalhado -> {id}")
+    #retornara um data frame com os dados da query:   
+    th_sp_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_sp_detalhado(id)).start()
+    #ler arquivo xlsx criado e exibir na label:
+    th_sp_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Resultado.xlsx')
+    print(th_sp_fech_esto_V2_detalhado_XLSX.info())
     
     #exibindo o data frame na tela:
-    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado_XLSX.head(5))
-    pyautogui.alert("XLSX detalhado finalizado com sucesso!" )
+    th_sp_fech_esto_V2_detalhado_XLSX = th_sp_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
+    label_file_dados.config(text=th_sp_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
     
         
 
@@ -125,8 +164,8 @@ if __name__ == "__main__":
         radio_sp.pack()
         
         #botao para exibicao de lista de fechamentos:
-        bt_list_V2_fech_esto_RJ = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [Unidade:=opcao_var.get() , print(f'botao bt_list_V2_fech_esto: {Unidade}') , Seleciona_query_List(Unidade) ])
-        bt_list_V2_fech_esto_RJ.pack(pady=10)
+        bt_list_V2_fech_lista = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [Unidade:=opcao_var.get() , print(f'botao bt_list_V2_fech_esto: {Unidade}') , Seleciona_query_List(Unidade) ])
+        bt_list_V2_fech_lista.pack(pady=10)
         
         label_file_lista = tk.Label(root,text='',border =0)
         label_file_lista.pack(pady=10)
@@ -134,8 +173,14 @@ if __name__ == "__main__":
         #botao para V2_fech_esto_RJ
         campo_entrada = tk.Entry(root)
         campo_entrada.pack(pady=10)
-        bt_V2_fech_esto_RJ = tk.Button(root, text="Detalhes Fechamento V2" , command=lambda: [rj_fech_esto_V2_detalhado(campo_entrada.get())])
-        bt_V2_fech_esto_RJ.pack(pady=10)
+        
+        
+        #TODO: verificar !!!!!!!!!!!!!!!!
+        bt_V2_fech_esto_detalh = tk.Button(root, text="Detalhes Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
+        bt_V2_fech_esto_detalh.pack(pady=10)
+        
+        
+        
         
         #TO DO: exibindo em tela :
         label_file_dados = tk.Label(root,text='',border =0)
@@ -146,3 +191,4 @@ if __name__ == "__main__":
     
     except Exception as err:
         print(f"Erro Inexperado: {err=}, \n{type(err)=}")
+        pyautogui.alert(f"Erro Inexperado: {err=}, \n{type(err)=}")
