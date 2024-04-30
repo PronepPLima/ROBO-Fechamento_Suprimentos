@@ -69,7 +69,9 @@ def es_fech_esto_V2_lista():
     th_es_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_es_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_es_fech_esto_V2_lista_XLSX['DT_FIM'] = th_es_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
     print(f'\n\n Data frame th_es_fech_esto_V2_lista_XLSX:\n{th_es_fech_esto_V2_lista_XLSX.info()}')
-    label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
+    
+    #exibindo data frame no label:
+    label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX.head(5).to_string(index=False) , justify='center', width=60, height=6)
     
 def rj_fech_esto_V2_lista():
     th_rj_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_rj_lista()).start()
@@ -79,7 +81,7 @@ def rj_fech_esto_V2_lista():
     th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_rj_fech_esto_V2_lista_XLSX['DT_FIM'] = th_rj_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
     print(f'\n\n Data frame th_rj_fech_esto_V2_lista_XLSX:\n{th_rj_fech_esto_V2_lista_XLSX.info()}')
-    label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX[['ID','DT_INICIO','DT_FIM']].head(5).to_string(index=False))
+    label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX[['ID','DT_INICIO','DT_FIM']].head(5).to_string(index=False) , justify='center', width=60, height=6)
     
 def sp_fech_esto_V2_lista():
     th_sp_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_sp_lista()).start()
@@ -89,7 +91,7 @@ def sp_fech_esto_V2_lista():
     th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
     th_sp_fech_esto_V2_lista_XLSX['DT_FIM'] = th_sp_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
     print(f'\n\n Data frame th_sp_fech_esto_V2_lista_XLSX:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
-    label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False))
+    label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX.head(5).to_string(index=False) , justify='center', width=60, height=6)
 
    
 #TODO: puxar detalhado do ES:
@@ -97,49 +99,10 @@ def es_fech_esto_V2_detalhado(id):
     print(f"************* es_fech_esto_V2_detalhado -> {id}")
     #retornara um data frame com os dados da query:   
     th_es_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_es_detalhado(id)).start()
+    
+    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
     #ler arquivo xlsx criado e exibir na label:
     th_es_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Resultado.xlsx')
-    print(th_es_fech_esto_V2_detalhado_XLSX.info())
-   
-    #th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
-    #print(f'Data frame apos o XLSX:\n{th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False)}\n\n')
-    
-    """
-    th_es_fech_esto_V2_detalhado_XLSX = th_es_fech_esto_V2_detalhado_XLSX[['TIPOMATERIAL' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
-    print(f'Data frame apos o XLSX:\n{th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False)}\n\n')
-    
-    #trazendo os valores distintos das dietas:
-    dietas_distintas = th_es_fech_esto_V2_detalhado_XLSX['TIPOMATERIAL'].unique()
-    print(f'valores distintos das dietas: {dietas_distintas}')
-    
-    #Separando as dietas:
-    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')
-    print(f'Sub total dietas inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
-    print(f'Sub total dietas final: {todas_as_dietas["VALOR_FINAL"].sum()}')
-    
-    #separando Mat. Enfermagem:
-    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')
-    print(f'Sub total Mat. Enfermagem inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
-    print(f'Sub total Mat. Enfermagem final: {todas_as_dietas["VALOR_FINAL"].sum()}')
-    
-    #separando Materiais Diversos:
-    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')
-    print(f'Sub total Materiais Diversos inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
-    print(f'Sub total Materiais Diversos final: {todas_as_dietas["VALOR_FINAL"].sum()}')
-        
-    #separando Medicamentos:
-    todas_as_dietas = th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')
-    print(f'Sub total Medicamentos inicial: {todas_as_dietas["VALOR_INIC"].sum()}')
-    print(f'Sub total Medicamentos final: {todas_as_dietas["VALOR_FINAL"].sum()}')    
-    
-    print('\n')
-    #somando todos os VALOR_INIC das dietas:
-    print(f'Total estoque inicial: {th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum()}')
-    
-    #somando todos os VALOR_FINAL das dietas:
-    print(f'Total estoque final: {th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()}')
-    
-    """
     
     #resultados inseridos num array:
     sub_totais = {
@@ -154,17 +117,13 @@ def es_fech_esto_V2_detalhado(id):
                     'Total estoque inicial' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
                     'Total estoque final' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
                 }
-    print(f'\n\nDicionario com resultados:\n{sub_totais}')
     
     #resultados inseridos em um data frame:
-    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=['Valor'])
-    print(f'\nResultados:\n{df_resultados.info}')   
+    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=['Valor R$'])
+    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
     
     #exibindo o data frame na tela:
-    label_file_dados.config(text=th_es_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
-    
-    #TODO: refatorar
-    label_file_dados.config(text=df_resultados)
+    label_file_dados.config(text=df_resultados , justify='left')
 
 
     
@@ -174,12 +133,27 @@ def rj_fech_esto_V2_detalhado(id):
     th_rj_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_rj_detalhado(id)).start()
     #ler arquivo xlsx criado e exibir na label:
     th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
-    print(th_rj_fech_esto_V2_detalhado_XLSX.info())
+    
+    #resultados inseridos num array:
+    sub_totais = {
+                    'Sub total dietas inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                    'Sub total dietas final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                    'Sub total Mat. Enfermagem inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                    'Sub total Mat. Enfermagem final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                    'Sub total Materiais Diversos inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                    'Sub total Materiais Diversos final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                    'Sub total Medicamentos inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                    'Sub total Medicamentos final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                    'Total estoque inicial' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
+                    'Total estoque final' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
+                }
+    
+    #resultados inseridos em um data frame:
+    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=['Valor R$'])
+    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
     
     #exibindo o data frame na tela:
-    th_rj_fech_esto_V2_detalhado_XLSX = th_rj_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
-    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
-    
+    label_file_dados.config(text=df_resultados , justify='left')
     
 def sp_fech_esto_V2_detalhado(id):   
     print(f"************* sp_fech_esto_V2_detalhado -> {id}")
@@ -187,11 +161,27 @@ def sp_fech_esto_V2_detalhado(id):
     th_sp_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_sp_detalhado(id)).start()
     #ler arquivo xlsx criado e exibir na label:
     th_sp_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Resultado.xlsx')
-    print(th_sp_fech_esto_V2_detalhado_XLSX.info())
+    
+    #resultados inseridos num array:
+    sub_totais = {
+                    'Sub total dietas inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                    'Sub total dietas final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                    'Sub total Mat. Enfermagem inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                    'Sub total Mat. Enfermagem final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                    'Sub total Materiais Diversos inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                    'Sub total Materiais Diversos final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                    'Sub total Medicamentos inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                    'Sub total Medicamentos final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                    'Total estoque inicial' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
+                    'Total estoque final' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
+                }
+    
+    #resultados inseridos em um data frame:
+    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=['Valor R$'])
+    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
     
     #exibindo o data frame na tela:
-    th_sp_fech_esto_V2_detalhado_XLSX = th_sp_fech_esto_V2_detalhado_XLSX[['NOME_MATERIAL' , 'QTDE_SALDO_INIC' , 'VALOR_INIC' , 'VALOR_FINAL' ]]
-    label_file_dados.config(text=th_sp_fech_esto_V2_detalhado_XLSX.head(5).to_string(index=False))
+    label_file_dados.config(text=df_resultados , justify='left')
     
         
 
