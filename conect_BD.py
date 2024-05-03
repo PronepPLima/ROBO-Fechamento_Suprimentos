@@ -18,12 +18,6 @@ connection.current_schema = "IW_PROD_RJ"
 
 class Conect_bd:
     
-    def to_string(self , df):
-        print(f'to_string(df)\n{df}')
-        #self.str = ""
-        #self.str = df
-        #return str
-        
     def v2_connection_es_lista():
         print(f'connection.current_schema = "IW_PROD_ES"')
         print("\n============================== v2_connection_es_lista ========================")
