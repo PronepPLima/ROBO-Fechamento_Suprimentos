@@ -26,6 +26,8 @@ imagem_redimencionada = imagem_original.resize((largura,altura))
 
 #Declaracao de variaveis globais:
 Unidade = ''
+descricoes = []
+valores = []
 
 
 
@@ -118,28 +120,29 @@ def es_fech_esto_V2_detalhado(id):
                     'Total estoque inicial' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
                     'Total estoque final' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
                 }
-    
-    #resultados inseridos em um data frame:
-    print(f'sub_totais:\n{sub_totais}')
-    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=[''])
-    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
-    
+
+    #Extraindo Chaves e Valores do Dicionário:
+    for chave, valor in sub_totais.items():
+        descricoes.append(chave)
+        valores.append(valor)
+    #Criando o DataFrame:
+    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+    # Nomeando as colunas
+    df_subtotais.columns = ["Descrição", "Valor"]  
+    #Gravando resultados no excel:
+    with pd.ExcelWriter('arquivos\IW_PROD_ES_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
+        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
     #exibindo o data frame na tela:
-    label_file_dados.config(text=df_resultados , justify='left', width=100)
+    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
+    label_file_dados.config(text=df_string, justify='right', width=100)
     
     
-    #TODO: 1. Preparando o Dicionário:
-    
-    #TODO: 2. Criando a Nova Aba:
-    
-    #TODO: 3. Integrando o Dicionário:
-
-
-    
-def rj_fech_esto_V2_detalhado(id):   
+def rj_fech_esto_V2_detalhado(id):        
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
     #retornara um data frame com os dados da query:   
     th_rj_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_rj_detalhado(id)).start()
+    
+    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
     #ler arquivo xlsx criado e exibir na label:
     th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
     
@@ -156,19 +159,28 @@ def rj_fech_esto_V2_detalhado(id):
                     'Total estoque inicial' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
                     'Total estoque final' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
                 }
-    
-    #resultados inseridos em um data frame:
-    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=[''])
-    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
-    
+
+    #Extraindo Chaves e Valores do Dicionário:
+    for chave, valor in sub_totais.items():
+        descricoes.append(chave)
+        valores.append(valor)
+    #Criando o DataFrame:
+    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+    # Nomeando as colunas
+    df_subtotais.columns = ["Descrição", "Valor"]  
+    #Gravando resultados no excel:
+    with pd.ExcelWriter('arquivos\IW_PROD_RJ_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
+        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
     #exibindo o data frame na tela:
-    label_file_dados.config(text=df_resultados , justify='left', width=100)
-    
+    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
+    label_file_dados.config(text=df_string, justify='right', width=100)
     
 def sp_fech_esto_V2_detalhado(id):   
     print(f"************* sp_fech_esto_V2_detalhado -> {id}")
     #retornara um data frame com os dados da query:   
     th_sp_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_sp_detalhado(id)).start()
+    
+    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
     #ler arquivo xlsx criado e exibir na label:
     th_sp_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Resultado.xlsx')
     
@@ -185,13 +197,21 @@ def sp_fech_esto_V2_detalhado(id):
                     'Total estoque inicial' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
                     'Total estoque final' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
                 }
-    
-    #resultados inseridos em um data frame:
-    df_resultados = pd.DataFrame.from_dict(sub_totais, orient='index', columns=[''])
-    print(f'\nData Frame Resultados:\n{df_resultados.info}')   
-    
+
+    #Extraindo Chaves e Valores do Dicionário:
+    for chave, valor in sub_totais.items():
+        descricoes.append(chave)
+        valores.append(valor)
+    #Criando o DataFrame:
+    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+    # Nomeando as colunas
+    df_subtotais.columns = ["Descrição", "Valor"]  
+    #Gravando resultados no excel:
+    with pd.ExcelWriter('arquivos\IW_PROD_SP_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
+        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
     #exibindo o data frame na tela:
-    label_file_dados.config(text=df_resultados , justify='left', width=100)
+    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
+    label_file_dados.config(text=df_string, justify='right', width=100)
     
         
 

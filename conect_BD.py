@@ -254,7 +254,7 @@ class Conect_bd:
         print(f'************************** {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-        data_frame.to_excel('arquivos\IW_PROD_ES_Resultado.xlsx' , index=False)
+        data_frame.to_excel('arquivos\IW_PROD_ES_Resultado.xlsx' , index=False , sheet_name='Analitico')
 
     
     def v2_connection_rj_detalhado(id):
@@ -427,7 +427,7 @@ class Conect_bd:
         print(f'************************** {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-        data_frame.to_excel('arquivos\IW_PROD_RJ_Resultado.xlsx' , index=False)
+        data_frame.to_excel('arquivos\IW_PROD_RJ_Resultado.xlsx' , index=False , sheet_name='Analitico')
         
     def v2_connection_sp_detalhado(id):
         print(f'connection.current_schema = "IW_PROD_SP"\ncom id:{id}')
@@ -599,4 +599,4 @@ class Conect_bd:
         print(f'************************** {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-        data_frame.to_excel('arquivos\IW_PROD_SP_Resultado.xlsx' , index=False)
+        data_frame.to_excel('arquivos\IW_PROD_SP_Resultado.xlsx' , index=False , sheet_name='Analitico')
