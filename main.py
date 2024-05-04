@@ -97,121 +97,30 @@ def sp_fech_esto_V2_lista():
     label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX[['ID','DT_INICIO']].head(5).to_string(index=False) , justify='center', width=20, height=6)
 
    
-#TODO: puxar detalhado do ES:
 def es_fech_esto_V2_detalhado(id):   
     print(f"************* es_fech_esto_V2_detalhado -> {id}")
+    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
-    th_es_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_es_detalhado(id)).start()
-    
-    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
-    #ler arquivo xlsx criado e exibir na label:
-    th_es_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Resultado.xlsx')
-    
-    #resultados inseridos num array:
-    sub_totais = {
-                    'Sub total dietas inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
-                    'Sub total dietas final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
-                    'Sub total Mat. Enfermagem inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
-                    'Sub total Mat. Enfermagem final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
-                    'Sub total Materiais Diversos inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
-                    'Sub total Materiais Diversos final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
-                    'Sub total Medicamentos inicial' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
-                    'Sub total Medicamentos final' : th_es_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
-                    'Total estoque inicial' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
-                    'Total estoque final' : th_es_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
-                }
-
-    #Extraindo Chaves e Valores do Dicionário:
-    for chave, valor in sub_totais.items():
-        descricoes.append(chave)
-        valores.append(valor)
-    #Criando o DataFrame:
-    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
-    # Nomeando as colunas
-    df_subtotais.columns = ["Descrição", "Valor"]  
-    #Gravando resultados no excel:
-    with pd.ExcelWriter('arquivos\IW_PROD_ES_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
-        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
-    #exibindo o data frame na tela:
-    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
-    label_file_dados.config(text=df_string, justify='right', width=100)
-    
+    th_es_fech_esto_V2_detalhado = Conect_bd.v2_connection_es_detalhado(id)
+    print(f"th_es_fech_esto_V2_detalhado:\n{th_es_fech_esto_V2_detalhado.head(10).to_string(index=False)}")
+    label_file_dados.config(text=th_es_fech_esto_V2_detalhado.head(10).to_string(index=False) , justify='center', width=100)
+       
     
 def rj_fech_esto_V2_detalhado(id):        
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
+    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
-    th_rj_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_rj_detalhado(id)).start()
-    
-    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
-    #ler arquivo xlsx criado e exibir na label:
-    th_rj_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
-    
-    #resultados inseridos num array:
-    sub_totais = {
-                    'Sub total dietas inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
-                    'Sub total dietas final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
-                    'Sub total Mat. Enfermagem inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
-                    'Sub total Mat. Enfermagem final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
-                    'Sub total Materiais Diversos inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
-                    'Sub total Materiais Diversos final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
-                    'Sub total Medicamentos inicial' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
-                    'Sub total Medicamentos final' : th_rj_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
-                    'Total estoque inicial' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
-                    'Total estoque final' : th_rj_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
-                }
-
-    #Extraindo Chaves e Valores do Dicionário:
-    for chave, valor in sub_totais.items():
-        descricoes.append(chave)
-        valores.append(valor)
-    #Criando o DataFrame:
-    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
-    # Nomeando as colunas
-    df_subtotais.columns = ["Descrição", "Valor"]  
-    #Gravando resultados no excel:
-    with pd.ExcelWriter('arquivos\IW_PROD_RJ_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
-        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
-    #exibindo o data frame na tela:
-    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
-    label_file_dados.config(text=df_string, justify='right', width=100)
+    th_rj_fech_esto_V2_detalhado = Conect_bd.v2_connection_rj_detalhado(id)
+    #print(f"th_rj_fech_esto_V2_detalhado:\n{th_rj_fech_esto_V2_detalhado}")
+    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado, justify='right', width=100)
     
 def sp_fech_esto_V2_detalhado(id):   
-    print(f"************* sp_fech_esto_V2_detalhado -> {id}")
+    print(f"************* rj_fech_esto_V2_detalhado -> {id}")
+    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
-    th_sp_fech_esto_V2_detalhado = threading.Thread(target=Conect_bd.v2_connection_sp_detalhado(id)).start()
-    
-    #TODO: refatorar todo o codigo abaixo, pois deveria estar dentro de um classe que manipule o data frame e nao na main que é só execucao:
-    #ler arquivo xlsx criado e exibir na label:
-    th_sp_fech_esto_V2_detalhado_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Resultado.xlsx')
-    
-    #resultados inseridos num array:
-    sub_totais = {
-                    'Sub total dietas inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
-                    'Sub total dietas final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
-                    'Sub total Mat. Enfermagem inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
-                    'Sub total Mat. Enfermagem final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
-                    'Sub total Materiais Diversos inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
-                    'Sub total Materiais Diversos final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
-                    'Sub total Medicamentos inicial' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
-                    'Sub total Medicamentos final' : th_sp_fech_esto_V2_detalhado_XLSX.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
-                    'Total estoque inicial' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_INIC"].sum(),
-                    'Total estoque final' : th_sp_fech_esto_V2_detalhado_XLSX["VALOR_FINAL"].sum()
-                }
-
-    #Extraindo Chaves e Valores do Dicionário:
-    for chave, valor in sub_totais.items():
-        descricoes.append(chave)
-        valores.append(valor)
-    #Criando o DataFrame:
-    df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
-    # Nomeando as colunas
-    df_subtotais.columns = ["Descrição", "Valor"]  
-    #Gravando resultados no excel:
-    with pd.ExcelWriter('arquivos\IW_PROD_SP_Resultado.xlsx', engine='openpyxl', mode='a') as writer:
-        df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
-    #exibindo o data frame na tela:
-    df_string = df_subtotais.reset_index(drop=True).to_string(index=False, col_space=10)
-    label_file_dados.config(text=df_string, justify='right', width=100)
+    th_rj_fech_esto_V2_detalhado = Conect_bd.v2_connection_sp_detalhado(id)
+    #print(f"th_rj_fech_esto_V2_detalhado:\n{th_rj_fech_esto_V2_detalhado}")
+    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado, justify='right', width=100)
     
         
 
@@ -226,11 +135,11 @@ if __name__ == "__main__":
 
         #montar interface gráfica:
         root = tk.Tk()
-        root.geometry("800x700")
-        root.minsize(800,700)
-        root.maxsize(800,700)
+        root.geometry("800x600")
+        root.minsize(800,600)
+        root.maxsize(800,600)
         #root.maxsize(1000,900)
-        root.title("ROBO - Fechamento Suprimentos 1.0")
+        root.title("Fechamento Suprimentos 1.0")
         #root.configure(bg="white")
        
         
@@ -260,7 +169,7 @@ if __name__ == "__main__":
         radio_sp.place(x=195 , y=230)
         
         #botao para exibicao de lista de fechamentos:
-        bt_list_V2_fech_lista = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [Unidade:=opcao_var.get() , print(f'botao bt_list_V2_fech_esto: {Unidade}') , Seleciona_query_List(Unidade) ])
+        bt_list_V2_fech_lista = tk.Button(root, text="Lista Fechamentos V2" , command=lambda: [Unidade:=opcao_var.get() , Seleciona_query_List(Unidade) ])
         bt_list_V2_fech_lista.place(x=310 , y=210)
         
         frame3 = tk.Frame(root , width=146,height=96, background="light gray").place(x=520 , y=170)
@@ -277,40 +186,22 @@ if __name__ == "__main__":
         label_titulo2 = tk.Label(frame_titulo2, text="Busca materiais/medicamentos:" , background="gray" ,font=("Arial", 10, "bold"),foreground="white").place(x=10 , y=274)
 
         #botao para V2_fech_esto_RJ
-        label_campo_entrada = tk.Label(root, text="Digite o ID:").place(x=10 , y=310)
+        label_campo_entrada = tk.Label(root, text="Digite o ID:").place(x=195 , y=310)
         campo_entrada = tk.Entry(root, width=3)
-        campo_entrada.place(x=80 , y=310)
+        campo_entrada.place(x=270 , y=310)
         
         bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
-        bt_V2_fech_esto_detalh.place(x=15,y=340)
+        bt_V2_fech_esto_detalh.place(x=310,y=310)
         
-        label_file_dados = tk.Label(root,text='',border =0)
-        label_file_dados.place(x=150 , y=310)
+        label_file_dados = tk.Label(root,text='',border =0 , width=40 , height=12)
+        label_file_dados.place(x=250 , y=340)
+        
+        label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
+        label_rodape.place(x=453 , y=584)
         
         root.mainloop()
         print("\n============================== fim ========================")
 
-    
-    
-        """
-        print("\n============================== inicio ========================")
-
-        #montar interface gráfica:
-        root = ctk.CTk()
-        root.geometry("1024x800")
-        #root.minsize(800,700)
-        #root.maxsize(1000,900)
-        root.title("ROBO - Fechamento Suprimentos 1.0")
-        #root.configure(bg="white")
-        
-        
-        frame1 = ctk.CTkFrame(master=root , width=1020 , height=250 , fg_color="red").place(x=2,y=5)
-        frame2 = ctk.CTkFrame(root , width=1020 , height=250 , fg_color="green").place(x=2,y=260)
-        frame3 = ctk.CTkFrame(root , width=1020 , height=250 , fg_color="blue").place(x=2,y=520)
-        root.mainloop() 
-        """
-        
-          
     
     except Exception as err:
         print(f"Erro Inexperado: {err=}, \n{type(err)=}")

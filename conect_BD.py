@@ -5,7 +5,7 @@ import pandas as pd
 import pyodbc
 import xlsxwriter
 import oracledb
-
+import openpyxl
 
 # Configurações do banco de dados
 server = '10.20.0.129'
@@ -15,6 +15,11 @@ password = 'Pronasis1508'
 
 connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
 connection.current_schema = "IW_PROD_RJ"
+
+descricoes = []
+valores = []
+
+
 
 class Conect_bd:
     
@@ -38,6 +43,7 @@ class Conect_bd:
         results = cursor.execute(query)
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
         data_frame.to_excel('arquivos\IW_PROD_ES_Lista.xlsx' , index=False)
+        cursor.close()
 
     def v2_connection_rj_lista():
         print(f'connection.current_schema = "IW_PROD_RJ"')
@@ -59,6 +65,7 @@ class Conect_bd:
         results = cursor.execute(query)
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
         data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
+        cursor.close()
         
         
     def v2_connection_sp_lista():
@@ -81,13 +88,13 @@ class Conect_bd:
         results = cursor.execute(query)
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
         data_frame.to_excel('arquivos\IW_PROD_SP_Lista.xlsx' , index=False)
+        cursor.close()
         
 
     def v2_connection_es_detalhado(id):
         print(f'connection.current_schema = "IW_PROD_RJ"\ncom id:{id}')
         print("\n============================== v2_connection_rj_detalhado ========================")
         print(f"connection: {connection}\nSuccessfully connected to Oracle Database")
-        # Consulta SQL
         cursor = connection.cursor()
         query ="""
 
@@ -251,10 +258,72 @@ class Conect_bd:
                     ORDER BY f.name, e.name
         """
         id = id
-        print(f'************************** {id}')
+        print(f'************************** Id: {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-        data_frame.to_excel('arquivos\IW_PROD_ES_Resultado.xlsx' , index=False , sheet_name='Analitico')
+        print('\nAqui esta o data frame:\n')
+        
+        #salvando arquivo xlsx:
+        #print(f"\n============================= IW_PROD_ES Salvando arquivo xslx =============================")
+        #data_frame.to_excel('arquivos\IW_PROD_ES_Resultado.xlsx' , index=False , sheet_name='Analitico')
+        
+        #print(f"\n============================= v2_exibicao_es_detalhado ")
+        #ler o arquivo xlsx;
+        #data_frame = pd.read_excel('arquivos\IW_PROD_ES_Resultado.xlsx')
+        
+        #retornar em data frame o xlsx sintetico:
+        #resultados inseridos num array:
+        sub_totais = {}
+        print(f"\nAqui esta o SUB_TOTAIS:\n")
+        sub_totais = {
+                        'IW ES - FECHAMENTO': id,
+                        'Sub total dietas inicial' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                        'Sub total dietas final' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                        'Sub total Mat. Enfermagem inicial' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                        'Sub total Mat. Enfermagem final' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                        'Sub total Materiais Diversos inicial' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                        'Sub total Materiais Diversos final' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                        'Sub total Medicamentos inicial' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                        'Sub total Medicamentos final' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                        'Total estoque inicial' : data_frame["VALOR_INIC"].sum(),
+                        'Total estoque final' : data_frame["VALOR_FINAL"].sum()
+                    }
+        print(sub_totais)
+        
+        #Extraindo Chaves e Valores do Dicionário:
+        for chave, valor in sub_totais.items():
+            descricoes.append(chave)
+            valores.append(valor)
+        #Criando o DataFrame:
+        df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+        # Nomeando as colunas
+        df_subtotais.columns = ["Descrição", "Valor"] 
+        
+        with pd.ExcelWriter('arquivos\IW_PROD_ES_Resultado.xlsx', engine='openpyxl', mode='w') as writer:
+            data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=True)
+            df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=False)
+        return df_subtotais
+
+        
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
     
     def v2_connection_rj_detalhado(id):
@@ -424,10 +493,49 @@ class Conect_bd:
                             ORDER BY f.name, e.name
         """
         id = id
-        print(f'************************** {id}')
+        print(f'************************** Id: {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+        
+        #salvando arquivo xlsx:
+        print(f"\n============================= IW_PROD_RJ Salvando arquivo xslx =============================")
         data_frame.to_excel('arquivos\IW_PROD_RJ_Resultado.xlsx' , index=False , sheet_name='Analitico')
+        
+        print(f"\n============================= v2_exibicao_rj_detalhado ")
+        #ler o arquivo xlsx;
+        data_frame = pd.read_excel('arquivos\IW_PROD_RJ_Resultado.xlsx')
+        
+        #retornar em data frame o xlsx sintetico:
+        #resultados inseridos num array:
+        sub_totais = {}
+        print(f"\nAqui esta o SUB_TOTAIS:\n")
+        sub_totais = {
+                        'Sub total dietas inicial' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                        'Sub total dietas final' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                        'Sub total Mat. Enfermagem inicial' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                        'Sub total Mat. Enfermagem final' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                        'Sub total Materiais Diversos inicial' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                        'Sub total Materiais Diversos final' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                        'Sub total Medicamentos inicial' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                        'Sub total Medicamentos final' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                        'Total estoque inicial' : data_frame["VALOR_INIC"].sum(),
+                        'Total estoque final' : data_frame["VALOR_FINAL"].sum()
+                    }
+        
+        #Extraindo Chaves e Valores do Dicionário:
+        for chave, valor in sub_totais.items():
+            descricoes.append(chave)
+            valores.append(valor)
+        #Criando o DataFrame:
+        df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+        # Nomeando as colunas
+        df_subtotais.columns = ["Descrição", "Valor"] 
+        
+        with pd.ExcelWriter('arquivos\IW_PROD_RJ_Resultado.xlsx', engine='openpyxl', mode='w') as writer:
+            data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=None)
+            df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
+
+        return df_subtotais
         
     def v2_connection_sp_detalhado(id):
         print(f'connection.current_schema = "IW_PROD_SP"\ncom id:{id}')
@@ -599,4 +707,42 @@ class Conect_bd:
         print(f'************************** {id}')
         results = cursor.execute(query, [id])
         data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+        #salvando arquivo xlsx:
+        print(f"\n============================= IW_PROD_SP Salvando arquivo xslx =============================")
         data_frame.to_excel('arquivos\IW_PROD_SP_Resultado.xlsx' , index=False , sheet_name='Analitico')
+        
+        print(f"\n============================= v2_exibicao_sp_detalhado ")
+        #ler o arquivo xlsx;
+        data_frame = pd.read_excel('arquivos\IW_PROD_SP_Resultado.xlsx')
+        
+        #retornar em data frame o xlsx sintetico:
+        #resultados inseridos num array:
+        sub_totais = {}
+        print(f"\nAqui esta o SUB_TOTAIS:\n")
+        sub_totais = {
+                        'Sub total dietas inicial' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                        'Sub total dietas final' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                        'Sub total Mat. Enfermagem inicial' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                        'Sub total Mat. Enfermagem final' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                        'Sub total Materiais Diversos inicial' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                        'Sub total Materiais Diversos final' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                        'Sub total Medicamentos inicial' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                        'Sub total Medicamentos final' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                        'Total estoque inicial' : data_frame["VALOR_INIC"].sum(),
+                        'Total estoque final' : data_frame["VALOR_FINAL"].sum()
+                    }
+        
+        #Extraindo Chaves e Valores do Dicionário:
+        for chave, valor in sub_totais.items():
+            descricoes.append(chave)
+            valores.append(valor)
+        #Criando o DataFrame:
+        df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+        # Nomeando as colunas
+        #df_subtotais.columns = ["Descrição", "Valor"] 
+        
+        with pd.ExcelWriter('arquivos\IW_PROD_SP_Resultado.xlsx', engine='openpyxl', mode='w') as writer:
+            data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=None)
+            df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=None)
+
+        return df_subtotais       
