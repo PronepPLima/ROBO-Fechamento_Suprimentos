@@ -2,6 +2,7 @@
 #@PLima
 
 import tkinter as tk
+from tabulate import tabulate
 from PIL import Image, ImageTk
 from tkinter import filedialog
 import pandas as pd
@@ -12,6 +13,8 @@ from conect_BD import Conect_bd
 import threading
 import pyautogui
 import customtkinter as ctk
+import time
+import oracledb
 
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
@@ -30,6 +33,35 @@ descricoes = []
 valores = []
 
 
+# Configurações do banco de dados
+server = '10.20.0.129'
+database = 'pronep'
+username = 'SYSTEM'
+password = 'Pronasis1508'
+
+connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
+
+cursor = "" 
+
+def reinicia_label_file_dados():
+    label_file_dados.config(text=" ")
+    label_file_lista.config(text=" ")
+
+def Atualiza_label_file_dados(texto):
+    print(f"\nAtualiza_label_file_dados\n")
+    label_file_dados.config(text=" ") 
+    time.sleep(1)
+    label_file_dados.config(text=texto)
+    #label_file_dados.config(text=texto , justify='center', width=100)
+    
+def gerar_tabela_texto(texto):
+    tabela_texto = tabulate(texto, headers="keys", tablefmt="simple")
+    return tabela_texto
+
+def atualizar_tabela(texto):
+    tabela_texto = texto()
+    label_file_dados.config(text=tabela_texto)
+    
 
 def Seleciona_query_List(opcao):
     print(f'Opcao selecionado: {opcao}')
@@ -65,62 +97,104 @@ def Seleciona_query_Detalhe(opcao , id_fech):
     
 
 def es_fech_esto_V2_lista():
-    th_es_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_es_lista()).start()
-    th_es_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_ES_Lista.xlsx')
-    #FORMATANDO DATA:
-    th_es_fech_esto_V2_lista_XLSX = th_es_fech_esto_V2_lista_XLSX
-    th_es_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_es_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
-    th_es_fech_esto_V2_lista_XLSX['DT_FIM'] = th_es_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame th_es_fech_esto_V2_lista_XLSX:\n{th_es_fech_esto_V2_lista_XLSX.info()}')
-    
-    #exibindo data frame no label:
-    label_file_lista.config(text=th_es_fech_esto_V2_lista_XLSX[['ID','DT_INICIO']].head(5).to_string(index=False) , justify='center', width=20, height=6)
+    global connection
+    print(f"\n============================= es_fech_esto_V2_lista:\n")
+    print(f"global connection: {connection}")
+    cursor = connection.cursor()
+    connection.current_schema = "IW_PROD_ES"
+    print(f"")
+    query = """
+                    select 
+                        TD_ICW_FECH_EST_C8.ID                                AS ID,                        
+                        TO_CHAR(TD_ICW_FECH_EST_C8.DATAT0,'dd/mm/yyyy')      AS DT_INICIO
+                    from TD_ICW_FECH_EST_C8 
+                    where TD_ICW_FECH_EST_C8.id>0 
+                    order by 1 desc
+            """
+    print(f"Query:\n{query}")
+    results = cursor.execute(query)
+    print(f"Results:\n{results}")
+    data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+    #data_frame.to_excel('arquivos\IW_PROD_ES_Lista.xlsx' , index=False)
+    cursor.close()
+    #editando as datas antes de exibir:
+    print(f"data_frame:\n{data_frame}")
+    label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
     
 def rj_fech_esto_V2_lista():
-    th_rj_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_rj_lista()).start()
-    th_rj_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_RJ_Lista.xlsx')
-    #FORMATANDO DATA:
-    th_rj_fech_esto_V2_lista_XLSX = th_rj_fech_esto_V2_lista_XLSX
-    th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_rj_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
-    th_rj_fech_esto_V2_lista_XLSX['DT_FIM'] = th_rj_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame th_rj_fech_esto_V2_lista_XLSX:\n{th_rj_fech_esto_V2_lista_XLSX.info()}')
-    label_file_lista.config(text=th_rj_fech_esto_V2_lista_XLSX[['ID','DT_INICIO']].head(5).to_string(index=False) , justify='center', width=20, height=6)
+    global connection
+    print(f"\n============================= rj_fech_esto_V2_lista:\n")
+    print(f"global connection: {connection}")
+    cursor = connection.cursor()
+    connection.current_schema = "IW_PROD_RJ"
+    print(f"")
+    query = """
+                    select 
+                        TD_ICW_FECH_EST_C8.ID                                AS ID,                        
+                        TO_CHAR(TD_ICW_FECH_EST_C8.DATAT0,'dd/mm/yyyy')      AS DT_INICIO
+                    from TD_ICW_FECH_EST_C8 
+                    where TD_ICW_FECH_EST_C8.id>0 
+                    order by 1 desc
+            """
+    print(f"Query:\n{query}")
+    results = cursor.execute(query)
+    print(f"Results:\n{results}")
+    data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+    #data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
+    cursor.close()
+    #editando as datas antes de exibir:
+    print(f"data_frame:\n{data_frame}")
+    label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
     
 def sp_fech_esto_V2_lista():
-    th_sp_fech_esto_V2_lista = threading.Thread(target=Conect_bd.v2_connection_sp_lista()).start()
-    th_sp_fech_esto_V2_lista_XLSX = pd.read_excel('arquivos\IW_PROD_SP_Lista.xlsx')
-    #FORMATANDO DATA:
-    th_sp_fech_esto_V2_lista_XLSX = th_sp_fech_esto_V2_lista_XLSX
-    th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'] = th_sp_fech_esto_V2_lista_XLSX['DT_INICIO'].dt.strftime('%d-%m-%Y')
-    th_sp_fech_esto_V2_lista_XLSX['DT_FIM'] = th_sp_fech_esto_V2_lista_XLSX['DT_FIM'].dt.strftime('%d-%m-%Y')
-    print(f'\n\n Data frame th_sp_fech_esto_V2_lista_XLSX:\n{th_sp_fech_esto_V2_lista_XLSX.info()}')
-    label_file_lista.config(text=th_sp_fech_esto_V2_lista_XLSX[['ID','DT_INICIO']].head(5).to_string(index=False) , justify='center', width=20, height=6)
-
+    global connection
+    print(f"\n============================= sp_fech_esto_V2_lista:\n")
+    print(f"global connection: {connection}")
+    cursor = connection.cursor()
+    connection.current_schema = "IW_PROD_SP"
+    print(f"")
+    query = """
+                    select 
+                        TD_ICW_FECH_EST_C8.ID                                AS ID,                        
+                        TO_CHAR(TD_ICW_FECH_EST_C8.DATAT0,'dd/mm/yyyy')      AS DT_INICIO
+                    from TD_ICW_FECH_EST_C8 
+                    where TD_ICW_FECH_EST_C8.id>0 
+                    order by 1 desc
+            """
+    print(f"Query:\n{query}")
+    results = cursor.execute(query)
+    print(f"Results:\n{results}")
+    data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
+    #data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
+    cursor.close()
+    #editando as datas antes de exibir:
+    print(f"data_frame:\n{data_frame}")
+    label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
    
 def es_fech_esto_V2_detalhado(id):   
     print(f"************* es_fech_esto_V2_detalhado -> {id}")
-    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
+    
+    #TODO: o problma de nao atualizar parece estar aqui
+    th_es_fech_esto_V2_detalhado = "" 
     th_es_fech_esto_V2_detalhado = Conect_bd.v2_connection_es_detalhado(id)
-    print(f"th_es_fech_esto_V2_detalhado:\n{th_es_fech_esto_V2_detalhado.head(10).to_string(index=False)}")
-    label_file_dados.config(text=th_es_fech_esto_V2_detalhado.head(10).to_string(index=False) , justify='center', width=100)
+    print(f"\n\n****th_es_fech_esto_V2_detalhado:\n{th_es_fech_esto_V2_detalhado.head(10).to_string(index=False)}")
+    Atualiza_label_file_dados(th_es_fech_esto_V2_detalhado.head(10).to_string(index=False))
        
     
 def rj_fech_esto_V2_detalhado(id):        
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
-    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
     th_rj_fech_esto_V2_detalhado = Conect_bd.v2_connection_rj_detalhado(id)
-    #print(f"th_rj_fech_esto_V2_detalhado:\n{th_rj_fech_esto_V2_detalhado}")
-    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado, justify='right', width=100)
+    Atualiza_label_file_dados("")
+    #TODO:
+    Atualiza_label_file_dados(th_rj_fech_esto_V2_detalhado.head(10).to_string(index=False))
     
 def sp_fech_esto_V2_detalhado(id):   
     print(f"************* rj_fech_esto_V2_detalhado -> {id}")
-    label_file_dados.config(text="", width=100)
     #retornara um data frame com os dados da query:   
-    th_rj_fech_esto_V2_detalhado = Conect_bd.v2_connection_sp_detalhado(id)
-    #print(f"th_rj_fech_esto_V2_detalhado:\n{th_rj_fech_esto_V2_detalhado}")
-    label_file_dados.config(text=th_rj_fech_esto_V2_detalhado, justify='right', width=100)
+    th_sp_fech_esto_V2_detalhado = Conect_bd.v2_connection_sp_detalhado(id)
+    Atualiza_label_file_dados(th_sp_fech_esto_V2_detalhado.head(10).to_string(index=False))
     
         
 
@@ -159,13 +233,13 @@ if __name__ == "__main__":
         frame_titulo1 = tk.Frame(root, width=150, height=28, background="gray").place(x=2,y=160)
         label_titulo1 = tk.Label(frame_titulo1, text="Busca Fechamentos:" , background="gray" ,font=("Arial", 10, "bold"),foreground="white").place(x=10 , y=162)
     
-        radio_es = tk.Radiobutton(root ,text="IW ES", variable=opcao_var, value='IW_ES' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}'), Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
+        radio_es = tk.Radiobutton(root ,text="IW ES", variable=opcao_var, value='IW_ES' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , reinicia_label_file_dados() , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_es.place(x=195 , y=190)
         
-        radio_rj = tk.Radiobutton(root ,text="IW RJ", variable=opcao_var , value='IW_RJ' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
+        radio_rj = tk.Radiobutton(root ,text="IW RJ", variable=opcao_var , value='IW_RJ' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , reinicia_label_file_dados() , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_rj.place(x=195 , y=210)
     
-        radio_sp = tk.Radiobutton(root ,text="IW SP", variable=opcao_var, value='IW_SP' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}'), Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
+        radio_sp = tk.Radiobutton(root ,text="IW SP", variable=opcao_var, value='IW_SP' ,command=lambda: [print(f'RadionButton: {opcao_var.get()}') , reinicia_label_file_dados() , Unidade:=opcao_var.get(), print(f'Unidade: {Unidade}')])
         radio_sp.place(x=195 , y=230)
         
         #botao para exibicao de lista de fechamentos:
@@ -189,15 +263,24 @@ if __name__ == "__main__":
         label_campo_entrada = tk.Label(root, text="Digite o ID:").place(x=195 , y=310)
         campo_entrada = tk.Entry(root, width=3)
         campo_entrada.place(x=270 , y=310)
-        
-        bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
+                
+        bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ gerar_tabela_texto(""), Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
         bt_V2_fech_esto_detalh.place(x=310,y=310)
         
-        label_file_dados = tk.Label(root,text='',border =0 , width=40 , height=12)
-        label_file_dados.place(x=250 , y=340)
+        #label_file_dados = tk.Tab(root,text=' Exibição de resultado...',border =0 , width=40 , height=12)
+        #label_file_dados.place(x=250 , y=340)
+
         
+        # Criar Label para exibir a tabela
+        label_file_dados = tk.Label(root, text="", justify="left")
+        label_file_dados.place(x=250 , y=340)
+               
         label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
         label_rodape.place(x=453 , y=584)
+        
+        
+        bt_V2_fech_esto_detalh = tk.Button(root, text=" Reiniciar " , command=lambda: [reinicia_label_file_dados()])
+        bt_V2_fech_esto_detalh.place(x=5,y=570)
         
         root.mainloop()
         print("\n============================== fim ========================")
