@@ -12,6 +12,7 @@ from conect_BD import Conect_bd
 import pyautogui
 import customtkinter as ctk
 import oracledb
+import datetime
 
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
@@ -39,6 +40,11 @@ password = 'Pronasis1508'
 connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
 
 cursor = "" 
+
+def agora():
+    agora = datetime.datetime.now()
+    agora = agora.strftime("%d_%m_%Y_%H_%M_%S")
+    return str(agora)
 
 def reinicia_label_file_dados():
     label_file_dados.config(text=" ")
@@ -292,7 +298,7 @@ def fech_esto_V2_detalhado(id , esquema):
     sub_totais = {}
     print(f"\nAqui esta o SUB_TOTAIS:")
     sub_totais = {
-                    (esquema +' - FECHAMENTO'): id,
+                    (esquema +' - FECHAMENTO'): ('ID: '+ id),
                     'Sub total dietas inicial' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
                     'Sub total dietas final' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
                     'Sub total Mat. Enfermagem inicial' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
@@ -316,12 +322,15 @@ def fech_esto_V2_detalhado(id , esquema):
     # Nomeando as colunas
     es_df_subtotais.columns = ["Descrição", "Valor"] 
     print(f"\nes_df_subtotais:\n{es_df_subtotais.info()}")
+    local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '_' + agora() + '.xlsx' )
+    #IW_PROD_ES_Resultado.xlsx
+    print(f"\nSalvando em:\n{esquema}")
     
-    with pd.ExcelWriter('arquivos\IW_PROD_ES_Resultado.xlsx', engine='openpyxl', mode='w') as writer:
+    with pd.ExcelWriter(local, engine='openpyxl', mode='w') as writer:
         data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=True)
         es_df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=False)
-        print(f"\nPLANILHAS GERADAS COM SUCESSO!!!")
-        pyautogui.alert(f"PLANILHAS GERADAS COM SUCESSO!!!")
+        print(f"\nPLANILHA GERADA COM SUCESSO!!!")
+        pyautogui.alert(f"PLANILHA GERADA COM SUCESSO!!!")
     #TODO:
     
     print(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
@@ -401,7 +410,7 @@ if __name__ == "__main__":
         bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
         bt_V2_fech_esto_detalh.place(x=310,y=310)
         
-        label_file_dados = tk.Label(root,text='',border =0 , width=40 , height=12)
+        label_file_dados = tk.Label(root,text='',border =0 , width=80 , height=12)
         label_file_dados.place(x=250 , y=340)
 
         
