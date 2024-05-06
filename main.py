@@ -2,7 +2,6 @@
 #@PLima
 
 import tkinter as tk
-from tabulate import tabulate
 from PIL import Image, ImageTk
 from tkinter import filedialog
 import pandas as pd
@@ -10,10 +9,8 @@ import numpy as py
 import warnings
 from pandastable import Table
 from conect_BD import Conect_bd
-import threading
 import pyautogui
 import customtkinter as ctk
-import time
 import oracledb
 
 #ignorando alertas exibidos:
@@ -47,21 +44,6 @@ def reinicia_label_file_dados():
     label_file_dados.config(text=" ")
     label_file_lista.config(text=" ")
 
-def Atualiza_label_file_dados(texto):
-    print(f"\nAtualiza_label_file_dados\n")
-    label_file_dados.config(text=" ") 
-    time.sleep(1)
-    label_file_dados.config(text=texto)
-    #label_file_dados.config(text=texto , justify='center', width=100)
-    
-def gerar_tabela_texto(texto):
-    tabela_texto = tabulate(texto, headers="keys", tablefmt="simple")
-    return tabela_texto
-
-def atualizar_tabela(texto):
-    tabela_texto = texto()
-    label_file_dados.config(text=tabela_texto)
-    
 
 def Seleciona_query_List(opcao):
     print(f'Opcao selecionado: {opcao}')
@@ -70,13 +52,13 @@ def Seleciona_query_List(opcao):
     
     if opcao=="IW_ES":
         print(f'Opcao escolhida: {opcao}')
-        es_fech_esto_V2_lista()
+        fech_esto_V2_lista("IW_PROD_ES")
     elif opcao=="IW_RJ":
         print(f'Opcao escolhida: {opcao}')
-        rj_fech_esto_V2_lista()
+        fech_esto_V2_lista("IW_PROD_RJ")
     elif opcao=="IW_SP":
         print(f'Opcao escolhida: {opcao}')
-        sp_fech_esto_V2_lista()
+        fech_esto_V2_lista("IW_PROD_SP")
     else:
         print(f'Opcao Invalida!!!')
         
@@ -85,24 +67,25 @@ def Seleciona_query_Detalhe(opcao , id_fech):
     
     if opcao=="IW_ES":
         print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
-        es_fech_esto_V2_detalhado(id_fech)
+        fech_esto_V2_detalhado(id_fech , "IW_PROD_ES")
     elif opcao=="IW_RJ":
         print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
-        rj_fech_esto_V2_detalhado(id_fech)
+        fech_esto_V2_detalhado(id_fech , "IW_PROD_RJ")
     elif opcao=="IW_SP":
         print(f'Opcao escolhida: {opcao}\nId preenchido:{id_fech}')
-        sp_fech_esto_V2_detalhado(id_fech)
+        fech_esto_V2_detalhado(id_fech , "IW_PROD_SP")
     else:
         print(f'Opcao Invalida!!!')
     
 
-def es_fech_esto_V2_lista():
+def fech_esto_V2_lista(esquema):
     global connection
-    print(f"\n============================= es_fech_esto_V2_lista:\n")
+    print(f"\n============================= fech_esto_V2_lista:\n")
     print(f"global connection: {connection}")
+    print(f"********** esquema: {esquema}")
     cursor = connection.cursor()
-    connection.current_schema = "IW_PROD_ES"
-    print(f"")
+    connection.current_schema = esquema#"IW_PROD_ES"
+    print(f"********** connection.current_schema: {connection.current_schema}")
     query = """
                     select 
                         TD_ICW_FECH_EST_C8.ID                                AS ID,                        
@@ -120,82 +103,233 @@ def es_fech_esto_V2_lista():
     #editando as datas antes de exibir:
     print(f"data_frame:\n{data_frame}")
     label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
+  
+def fech_esto_V2_detalhado(id , esquema):   
+    print(f"************* fech_esto_V2_detalhado -> {id}")
+    ##retornara um data frame com os dados da query:   
+    #
+    ##TODO: o problma de nao atualizar parece estar aqui
+    #th_es_fech_esto_V2_detalhado = "" 
+    #th_es_fech_esto_V2_detalhado = Conect_bd.v2_connection_es_detalhado(id)
+    #print(f"\n\n****th_es_fech_esto_V2_detalhado:\n{th_es_fech_esto_V2_detalhado.head(10).to_string(index=False)}")
+    #Atualiza_label_file_dados(th_es_fech_esto_V2_detalhado.head(10).to_string(index=False))
+    print(f"es_fech_esto_V2_detalhado com o ID: {id}")
     
-def rj_fech_esto_V2_lista():
     global connection
-    print(f"\n============================= rj_fech_esto_V2_lista:\n")
+    print(f"\n============================= fech_esto_V2_detalhado:\n")
     print(f"global connection: {connection}")
     cursor = connection.cursor()
-    connection.current_schema = "IW_PROD_RJ"
-    print(f"")
-    query = """
-                    select 
-                        TD_ICW_FECH_EST_C8.ID                                AS ID,                        
-                        TO_CHAR(TD_ICW_FECH_EST_C8.DATAT0,'dd/mm/yyyy')      AS DT_INICIO
-                    from TD_ICW_FECH_EST_C8 
-                    where TD_ICW_FECH_EST_C8.id>0 
-                    order by 1 desc
-            """
-    print(f"Query:\n{query}")
-    results = cursor.execute(query)
-    print(f"Results:\n{results}")
+    connection.current_schema = esquema#"IW_PROD_ES"
+    print(f"**********connection.current_schema: {connection.current_schema}")
+    query ="""
+
+                    SELECT
+                        --add manualmente a essa query o ID
+                        B.ID
+                        --, A.CD
+                        , F.NAME AS FILIALNAME
+                        , TO_CHAR( B.DATAT0, 'DD/MM/YYYY') AS DATAT0
+                        , TO_CHAR( (B.DATATF - 1 ) , 'DD/MM/YYYY') AS DATATF
+                        , E.Name AS TIPOMATERIAL
+                        , A.ScMaterial AS COD_MATERIAL
+                        , C.CodeName AS NOME_MATERIAL
+                        , D.MU AS UM
+                        , (CASE
+                            WHEN A.saldo_qt_t0 >= 0
+                            THEN A.saldo_qt_t0
+                            ELSE 0 END) AS Qtde_Saldo_Inic
+                        , (CASE
+                            WHEN A.saldo_qt_tf >= 0
+                            THEN A.saldo_qt_tf
+                            ELSE 0 END) AS Qtde_Saldo_Final
+                        , (CASE
+                            WHEN (A.ENTR_QT_T0_NF + A.ENTR_QT_T0_INICSD + A.ENTR_QT_T0_DEVOL + A.ENTR_QT_T0_INVENT + A.ENTR_QT_T0_EMP3) >= 0
+                            THEN (A.ENTR_QT_T0_NF + A.ENTR_QT_T0_INICSD + A.ENTR_QT_T0_DEVOL + A.ENTR_QT_T0_INVENT + A.ENTR_QT_T0_EMP3)
+                            ELSE 0 END ) AS Qtde_E_Total
+                        , (CASE
+                            WHEN (A.SAIDA_QT_T0_PAC + A.SAIDA_QT_T0_CCNPER + A.SAIDA_QT_T0_CCPERD + A.SAIDA_QT_T0_INVENT + A.SAIDA_QT_T0_DEVOL + A.SAIDA_QT_T0_EMP3) >= 0
+                            THEN (A.SAIDA_QT_T0_PAC + A.SAIDA_QT_T0_CCNPER + A.SAIDA_QT_T0_CCPERD + A.SAIDA_QT_T0_INVENT + A.SAIDA_QT_T0_DEVOL + A.SAIDA_QT_T0_EMP3)
+                            ELSE 0 END ) AS Qtde_S_TOTAL
+                        , (CASE
+                            WHEN A.ENTR_QT_T0_NF >= 0
+                            THEN A.ENTR_QT_T0_NF
+                            ELSE 0 END ) AS Qtde_E_NF
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_PAC >= 0
+                            THEN A.SAIDA_QT_T0_PAC
+                            ELSE 0 END) AS Qtde_S_Pac
+                        , (CASE
+                            WHEN A.ENTR_QT_T0_INICSD >= 0
+                            THEN A.ENTR_QT_T0_INICSD
+                            ELSE 0 END) AS Qtde_E_Ini_Sd
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_CCNPER >= 0
+                            THEN A.SAIDA_QT_T0_CCNPER
+                            ELSE 0 END) AS Qtde_S_Outr
+                        , (CASE
+                            WHEN A.ENTR_QT_T0_DEVOL >= 0
+                            THEN A.ENTR_QT_T0_DEVOL
+                            ELSE 0 END) AS Qtde_E_Devol
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_CCPERD >= 0
+                            THEN A.SAIDA_QT_T0_CCPERD
+                            ELSE 0 END) AS Qtde_S_Perda
+                        , (CASE
+                            WHEN A.ENTR_QT_T0_INVENT >= 0
+                            THEN A.ENTR_QT_T0_INVENT
+                            ELSE 0 END) AS Qtde_E_Invent
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_INVENT >= 0
+                            THEN A.SAIDA_QT_T0_INVENT
+                            ELSE 0 END) AS Qtde_S_Invent
+                        , (CASE
+                            WHEN A.ENTR_QT_T0_EMP3 >= 0
+                            THEN A.ENTR_QT_T0_EMP3
+                            ELSE 0 END) AS Qtde_E_3os
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_DEVOL >= 0
+                            THEN A.SAIDA_QT_T0_DEVOL
+                            ELSE 0 END) AS Qtde_S_Devol
+                        , (CASE
+                            WHEN A.SAIDA_QT_T0_EMP3 >= 0
+                            THEN A.SAIDA_QT_T0_EMP3
+                            ELSE 0 END) AS Qtde_S_3os
+                        , (CASE
+                            WHEN A.saldo_vl_t0 >= 0
+                            THEN A.saldo_vl_t0
+                            ELSE 0 END) AS Valor_Inic
+                        , (CASE
+                            WHEN A.saldo_vl_tf >= 0
+                            THEN A.saldo_vl_tf
+                            ELSE 0 END) AS Valor_Final
+                        , (CASE
+                            WHEN (A.ENTR_VL_INI_SD + A.ENTR_VL_NF_ENTRADA + A.ENTR_VL_INVENT + A.ENTR_VL_DEVOL + A.ENTR_VL_T0_EMP3) >=0
+                            THEN (A.ENTR_VL_INI_SD + A.ENTR_VL_NF_ENTRADA + A.ENTR_VL_INVENT + A.ENTR_VL_DEVOL + A.ENTR_VL_T0_EMP3)
+                            ELSE 0 END) AS Valor_E_Total
+                        , (CASE
+                            WHEN (A.VLSAI_QT_T0_PAC + A.VLSAI_QT_T0_CCPERD + A.VLSAI_QT_T0_CCNPER + A.VLSAI_QT_T0_INVENT + A.VLSAI_QT_T0_DEVOL + A.VLSAI_QT_T0_EMP3) >= 0
+                            THEN (A.VLSAI_QT_T0_PAC + A.VLSAI_QT_T0_CCPERD + A.VLSAI_QT_T0_CCNPER + A.VLSAI_QT_T0_INVENT + A.VLSAI_QT_T0_DEVOL + A.VLSAI_QT_T0_EMP3)
+                            ELSE 0 END) AS Valor_S_Total
+                        , (CASE
+                            WHEN A.ENTR_VL_NF_ENTRADA >= 0
+                            THEN A.ENTR_VL_NF_ENTRADA
+                            ELSE 0 END) AS Valor_E_NF
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_PAC >= 0
+                            THEN A.VLSAI_QT_T0_PAC
+                            ELSE 0 END) AS Valor_S_Pac
+                        , (CASE
+                            WHEN A.ENTR_VL_INI_SD >= 0
+                            THEN A.ENTR_VL_INI_SD
+                            ELSE 0 END) AS Valor_E_Ini_Sd
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_CCNPER >= 0
+                            THEN A.VLSAI_QT_T0_CCNPER
+                            ELSE 0 END) AS Valor_S_Outr
+                        , (CASE
+                            WHEN A.ENTR_VL_DEVOL >= 0
+                            THEN A.ENTR_VL_DEVOL
+                            ELSE 0 END) AS Valor_E_Devol
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_CCPERD >= 0
+                            THEN A.VLSAI_QT_T0_CCPERD
+                            ELSE 0 END) AS Valor_S_Perda
+                        , (CASE
+                            WHEN A.ENTR_VL_INVENT >= 0
+                            THEN A.ENTR_VL_INVENT
+                            ELSE 0 END) AS Valor_E_Invent
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_INVENT >= 0
+                            THEN A.VLSAI_QT_T0_INVENT
+                            ELSE 0 END) AS Valor_S_Invent
+                        , (CASE
+                            WHEN A.ENTR_VL_T0_EMP3 >= 0
+                            THEN A.ENTR_VL_T0_EMP3
+                            ELSE 0 END) AS Valor_E_3os
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_DEVOL >= 0
+                            THEN A.VLSAI_QT_T0_DEVOL
+                            ELSE 0 END) AS Valor_S_Devol
+                        , (CASE
+                            WHEN A.VLSAI_QT_T0_EMP3 >= 0
+                            THEN A.VLSAI_QT_T0_EMP3
+                            ELSE 0 END) AS Valor_S_3os
+                    FROM   
+                        TD_ICW_FECH_ESTOQ8 A,
+                        TD_ICW_FECH_EST_C8 B,
+                        SccCode C,
+                        MatMaterialType D,
+                        SccTable E,
+                        MatDispensingArea F
+                    WHERE  A.ScMaterial = C.id
+                        AND A.ScMaterial = D.ScMaterial
+                        AND A.idlot = B.id
+                        AND C.idtable = E.ID
+                        AND B.ID = :ID
+                        AND A.CD = F.ID
+                        AND ( A.entr_vl <> 0
+                                OR A.saida_vl <> 0
+                                OR A.saldo_m <> 0
+                                OR A.saldo_qt_tf <> 0
+                                OR A.saldo_qt_t0 <> 0
+                                OR A.saldo_vl_tf <> 0
+                                OR A.saldo_vl_t0 <> 0
+                                OR A.entr_qt_t0 <> 0
+                                OR A.saida_qt_t0 <> 0
+                                OR A.perdas_qt_t0 <> 0
+                                OR A.perdas_vl <> 0 )
+                        AND ENTR_QT_T0_NF IS NOT NULL
+                        AND F.ID = 1 
+                    ORDER BY f.name, e.name
+        """
+    id = id
+    print(f'************************** Id: {id}')
+    results = cursor.execute(query, [id])
     data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-    #data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
-    cursor.close()
-    #editando as datas antes de exibir:
-    print(f"data_frame:\n{data_frame}")
-    label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
+    print('\nAqui esta o data frame:\n')
+    print(f"{data_frame.info}\n")
+    #resultados inseridos num array:
+    sub_totais = {}
+    print(f"\nAqui esta o SUB_TOTAIS:")
+    sub_totais = {
+                    (esquema +' - FECHAMENTO'): id,
+                    'Sub total dietas inicial' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_INIC"].sum(),
+                    'Sub total dietas final' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_FINAL"].sum(),
+                    'Sub total Mat. Enfermagem inicial' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_INIC"].sum(),
+                    'Sub total Mat. Enfermagem final' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_FINAL"].sum(),
+                    'Sub total Materiais Diversos inicial' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_INIC"].sum(),
+                    'Sub total Materiais Diversos final' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_FINAL"].sum(),
+                    'Sub total Medicamentos inicial' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_INIC"].sum(),
+                    'Sub total Medicamentos final' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
+                    'Total estoque inicial' : data_frame["VALOR_INIC"].sum(),
+                    'Total estoque final' : data_frame["VALOR_FINAL"].sum()
+                }
+    print(f"\nsub_totais:\n{sub_totais}")
     
-def sp_fech_esto_V2_lista():
-    global connection
-    print(f"\n============================= sp_fech_esto_V2_lista:\n")
-    print(f"global connection: {connection}")
-    cursor = connection.cursor()
-    connection.current_schema = "IW_PROD_SP"
-    print(f"")
-    query = """
-                    select 
-                        TD_ICW_FECH_EST_C8.ID                                AS ID,                        
-                        TO_CHAR(TD_ICW_FECH_EST_C8.DATAT0,'dd/mm/yyyy')      AS DT_INICIO
-                    from TD_ICW_FECH_EST_C8 
-                    where TD_ICW_FECH_EST_C8.id>0 
-                    order by 1 desc
-            """
-    print(f"Query:\n{query}")
-    results = cursor.execute(query)
-    print(f"Results:\n{results}")
-    data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
-    #data_frame.to_excel('arquivos\IW_PROD_RJ_Lista.xlsx' , index=False)
-    cursor.close()
-    #editando as datas antes de exibir:
-    print(f"data_frame:\n{data_frame}")
-    label_file_lista.config(text=data_frame.head(5).to_string(index=False) , justify='center', width=20, height=6)
-   
-def es_fech_esto_V2_detalhado(id):   
-    print(f"************* es_fech_esto_V2_detalhado -> {id}")
-    #retornara um data frame com os dados da query:   
+    #Extraindo Chaves e Valores do Dicionário:
+    for chave, valor in sub_totais.items():
+        descricoes.append(chave)
+        valores.append(valor)
+    #Criando o DataFrame:
+    es_df_subtotais =""
+    es_df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
+    # Nomeando as colunas
+    es_df_subtotais.columns = ["Descrição", "Valor"] 
+    print(f"\nes_df_subtotais:\n{es_df_subtotais.info()}")
     
-    #TODO: o problma de nao atualizar parece estar aqui
-    th_es_fech_esto_V2_detalhado = "" 
-    th_es_fech_esto_V2_detalhado = Conect_bd.v2_connection_es_detalhado(id)
-    print(f"\n\n****th_es_fech_esto_V2_detalhado:\n{th_es_fech_esto_V2_detalhado.head(10).to_string(index=False)}")
-    Atualiza_label_file_dados(th_es_fech_esto_V2_detalhado.head(10).to_string(index=False))
-       
-    
-def rj_fech_esto_V2_detalhado(id):        
-    print(f"************* rj_fech_esto_V2_detalhado -> {id}")
-    #retornara um data frame com os dados da query:   
-    th_rj_fech_esto_V2_detalhado = Conect_bd.v2_connection_rj_detalhado(id)
-    Atualiza_label_file_dados("")
+    with pd.ExcelWriter('arquivos\IW_PROD_ES_Resultado.xlsx', engine='openpyxl', mode='w') as writer:
+        data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=True)
+        es_df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=False)
+        print(f"\nPLANILHAS GERADAS COM SUCESSO!!!")
+        pyautogui.alert(f"PLANILHAS GERADAS COM SUCESSO!!!")
     #TODO:
-    Atualiza_label_file_dados(th_rj_fech_esto_V2_detalhado.head(10).to_string(index=False))
     
-def sp_fech_esto_V2_detalhado(id):   
-    print(f"************* rj_fech_esto_V2_detalhado -> {id}")
-    #retornara um data frame com os dados da query:   
-    th_sp_fech_esto_V2_detalhado = Conect_bd.v2_connection_sp_detalhado(id)
-    Atualiza_label_file_dados(th_sp_fech_esto_V2_detalhado.head(10).to_string(index=False))
+    print(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
+    label_file_dados.config(text=es_df_subtotais.head(12).to_string(index=False) , justify='center', width=20, height=6)
     
+#TODO: rj_fech_esto_V2_detalhado
+
+#TODO: sp_fech_esto_V2_detalhado
         
 
 
@@ -264,11 +398,11 @@ if __name__ == "__main__":
         campo_entrada = tk.Entry(root, width=3)
         campo_entrada.place(x=270 , y=310)
                 
-        bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ gerar_tabela_texto(""), Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
+        bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
         bt_V2_fech_esto_detalh.place(x=310,y=310)
         
-        #label_file_dados = tk.Tab(root,text=' Exibição de resultado...',border =0 , width=40 , height=12)
-        #label_file_dados.place(x=250 , y=340)
+        label_file_dados = tk.Label(root,text='',border =0 , width=40 , height=12)
+        label_file_dados.place(x=250 , y=340)
 
         
         # Criar Label para exibir a tabela
@@ -277,11 +411,7 @@ if __name__ == "__main__":
                
         label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
         label_rodape.place(x=453 , y=584)
-        
-        
-        bt_V2_fech_esto_detalh = tk.Button(root, text=" Reiniciar " , command=lambda: [reinicia_label_file_dados()])
-        bt_V2_fech_esto_detalh.place(x=5,y=570)
-        
+       
         root.mainloop()
         print("\n============================== fim ========================")
 
