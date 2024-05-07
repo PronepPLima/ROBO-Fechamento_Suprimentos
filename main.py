@@ -343,19 +343,41 @@ def fech_esto_V2_detalhado(id , esquema):
                     'Sub total Medicamentos final' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_FINAL"].sum(),
                     'Sub Total estoque inicial' : data_frame["VALOR_INIC"].sum(),
                     'Sub Total estoque final' : data_frame["VALOR_FINAL"].sum(),
-                    '   ' : '   ',
+                    
                     'Aquisição dietas' : (data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_E_NF"].sum() + data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_E_INI_SD"].sum()),
                     'Aquisição Mat. Enfermagem' : (data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_NF"].sum() + data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_INI_SD"].sum()),
                     'Aquisição Materiais Diversos' : (data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_NF"].sum() + data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_INI_SD"].sum()),
                     'Aquisição Medicamentos' : (data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_NF"].sum() + data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_INI_SD"].sum()),
                     'Aquisição estoque' : (data_frame["VALOR_E_NF"].sum() + data_frame["VALOR_E_INI_SD"].sum()),
-                    '   ' : '   ',
                     'Devolução dietas ao fornecedor' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_S_DEVOL"].sum(),     
                     'Devolução Mat. Enfermagem ao fornecedor' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_S_DEVOL"].sum(),     
                     'Devolução Materiais Diversos ao fornecedor' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_S_DEVOL"].sum(),     
                     'Devolução Medicamentos ao fornecedor' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_S_DEVOL"].sum(),     
                     'Devolução ao fornecedor' : data_frame["VALOR_S_DEVOL"].sum(),
-                    '   ' : '   ',
+                    
+                    'Envio dietas para paciente ' : (data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_S_PAC"].sum() - (data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_S_PAC"].sum()*2)),
+                    'Envio Mat. Enfermagem para paciente ' : (data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_S_PAC"].sum() - (data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_S_PAC"].sum()*2)),
+                    'Envio Materiais Diversos para paciente ' : (data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_S_PAC"].sum()-(data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_S_PAC"].sum()*2)),
+                    'Envio Medicamentos para paciente ' : (data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_S_PAC"].sum()-(data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_S_PAC"].sum()*2)),                    
+                    'Envio para paciente ' : (data_frame["VALOR_S_PAC"].sum()-(data_frame["VALOR_S_PAC"].sum()*2)),
+                    
+                    'Devolução dietas ao paciente' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_E_DEVOL"].sum(),     
+                    'Devolução Mat. Enfermagem ao paciente' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_DEVOL"].sum(),     
+                    'Devolução Materiais Diversos ao paciente' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_DEVOL"].sum(),     
+                    'Devolução Medicamentos ao paciente' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_DEVOL"].sum(),     
+                    'Devolução ao paciente' : data_frame["VALOR_E_DEVOL"].sum(),
+                    
+                    'Ajustes dietas de inventário' : (data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_E_INVENT"].sum() - data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_S_INVENT"].sum()),
+                    'Ajustes Mat. Enfermagem de inventário' : (data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_INVENT"].sum() - data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_S_INVENT"].sum()),
+                    'Ajustes Materiais Diversos de inventário' : (data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_INVENT"].sum() - data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_S_INVENT"].sum()),
+                    'Ajustes Medicamentos de inventário' : (data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_INVENT"].sum() - data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_S_INVENT"].sum()),
+                    'Ajustes de inventário' : (data_frame["VALOR_E_INVENT"].sum() - data_frame["VALOR_S_INVENT"].sum()),
+                                        
+                    'Emprestimos dietas' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_E_3OS"].sum(),
+                    'Emprestimos Mat. Enfermagem' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_3OS"].sum(),
+                    'Emprestimos Materiais Diversos' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_3OS"].sum(),
+                    'Emprestimos Medicamentos' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_3OS"].sum(),
+                    'Emprestimos ' : data_frame["VALOR_E_3OS"].sum()
                 }
     print(f"\nsub_totais:\n{sub_totais}")
     #pyautogui.alert(f"{sub_totais}") 
@@ -406,7 +428,7 @@ def fech_esto_V2_detalhado(id , esquema):
     
     print(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
     #pyautogui.alert(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
-    label_file_dados.config(text=df_subtotais.head(12).to_string(index=False) , justify='right', width=80, height=18)
+    label_file_dados.config(text=df_subtotais.head(11).to_string(index=False) , justify='right', width=80, height=18)
     cursor.close()
     
 
@@ -428,9 +450,9 @@ if __name__ == "__main__":
 
         #montar interface gráfica:
         root = tk.Tk()
-        root.geometry("800x800")
-        root.minsize(800,800)
-        root.maxsize(800,800)
+        root.geometry("800x700")
+        root.minsize(800,700)
+        root.maxsize(800,700)
         #root.maxsize(1000,900)
         root.title("Fechamento Suprimentos 1.0")
         #root.configure(bg="white")
@@ -494,8 +516,8 @@ if __name__ == "__main__":
         label_file_dados = tk.Label(root, text="")
         label_file_dados.place(x=290 , y=340)
                
-        #label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
-        #label_rodape.place(x=453 , y=584)
+        label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
+        label_rodape.place(x=453 , y=678)
        
         root.mainloop()
         print("\n============================== fim ========================")
