@@ -15,6 +15,9 @@ import oracledb
 import datetime
 from cryptography.hazmat.primitives.kdf import pbkdf2
 
+import os
+
+
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
 
@@ -43,6 +46,24 @@ password = 'Pronasis1508'
 connection = oracledb.connect( user="SYSTEM", password="Pronasis1508", dsn="10.20.0.129/pronep")
 
 cursor = "" 
+
+def criar_pasta_arquivos():
+    diretorio = os.path.join(get_exe_directory(), "arquivos")
+
+    if not os.path.exists(diretorio):
+        try:
+            os.makedirs(diretorio)
+            print(f"Pasta '{diretorio}' criada com sucesso!")
+            #pyautogui.alert(f"Pasta '{diretorio}' criada com sucesso!") 
+        except OSError as e:
+            print(f"Erro ao criar pasta '{diretorio}': {e}")
+            
+            
+def get_exe_directory():
+    """Retorna o diretório do arquivo executável do programa."""
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 
 def agora():
     agora = datetime.datetime.now()
@@ -129,9 +150,9 @@ def fech_esto_V2_detalhado(id , esquema):
     
     global connection
     print(f"global connection: {connection}")
-    pyautogui.alert(f"{connection}")
+    #pyautogui.alert(f"{connection}")
     print(f"********** esquema: {esquema}")
-    pyautogui.alert(f"{ esquema }")
+    #pyautogui.alert(f"{ esquema }")
     cursor = connection.cursor()
     connection.current_schema = esquema#"IW_PROD_ES"
     print(f"**********connection.current_schema: {connection.current_schema}")
@@ -301,11 +322,11 @@ def fech_esto_V2_detalhado(id , esquema):
     results = cursor.execute(query, [id])
     
     print(f"***** results:\n{results}")
-    pyautogui.alert(f"\n{results}")
+    #pyautogui.alert(f"\n{results}")
     data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
     print('\nAqui esta o data frame:\n')
     print(f"{data_frame.info}\n")
-    pyautogui.alert(f"\n{data_frame.info}\n")
+    #pyautogui.alert(f"\n{data_frame.info}\n")
     #resultados inseridos num array:
     sub_totais = None
     print(f"***************** Subtotais:\n{sub_totais}")
@@ -324,13 +345,13 @@ def fech_esto_V2_detalhado(id , esquema):
                     'Total estoque final' : data_frame["VALOR_FINAL"].sum()
                 }
     print(f"\nsub_totais:\n{sub_totais}")
-    pyautogui.alert(f"{sub_totais}") 
+    #pyautogui.alert(f"{sub_totais}") 
     #Inicializando o Array para começar do zero:
     descricoes = []
     valores = []
     print(f"\ndescricoes: {descricoes}")
     print(f"valores: {valores}")
-    pyautogui.alert(f"descricoes: {descricoes}\nvalores: {valores}")
+    #pyautogui.alert(f"descricoes: {descricoes}\nvalores: {valores}")
     
     #Extraindo Chaves e Valores do Dicionário:
     for chave, valor in sub_totais.items():
@@ -339,23 +360,22 @@ def fech_esto_V2_detalhado(id , esquema):
         #pyautogui.alert(f"descricoes: {chave}\nvalores: {valor}")
         
     print(f"\nMARCACAO: \n{data_frame.info}\n")
-    pyautogui.alert(f"\nMARCACAO: \n{data_frame.info}\n")
+    #pyautogui.alert(f"\nMARCACAO: \n{data_frame.info}\n")
     label_file_dados.config(text=data_frame.info , justify='right', width=80, height=12)
     
     #Criando o DataFrame:
     df_subtotais = pd.DataFrame({"Descrição": descricoes,"Valor": valores})
-    
-    pyautogui.alert(f"{df_subtotais.info}")
+    #pyautogui.alert(f"{df_subtotais.info}")
     
     # Nomeando as colunas
     df_subtotais.columns = ["Descrição", "Valor"] 
     print(f"\nes_df_subtotais:\n{df_subtotais.info}")
-    pyautogui.alert(f"{df_subtotais.info}")
+    #pyautogui.alert(f"{df_subtotais.info}")
     
     #Salvando arquivo xlsx com Esquema:
-    #local = ('arquivos\\' + esquema + '.xlsx' )
-    local = (esquema + '.xlsx' )
-    pyautogui.alert(f"Local:\n{ local}")
+    local = ('arquivos\\' + esquema + '.xlsx' )
+    #local = (esquema + '.xlsx' )
+    #pyautogui.alert(f"Local:\n{ local}")
     #Salvando arquivo xlsx com Esquema e ID:
     #local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '.xlsx' )
     
@@ -363,16 +383,16 @@ def fech_esto_V2_detalhado(id , esquema):
     #local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '_' + agora() + '.xlsx' )
     
     print(f"\nSalvando em:\n{esquema}")
-    pyautogui.alert(f"\nSalvando em:\n{esquema}")
+    #pyautogui.alert(f"\nSalvando em:\n{esquema}")
     
     with pd.ExcelWriter(local, engine='openpyxl', mode='w') as writer:
         data_frame.to_excel(writer, sheet_name='Analitico', index=False, header=True)
         df_subtotais.to_excel(writer, sheet_name='Sintetico', index=False, header=False)
         print(f"\nPLANILHA GERADA COM SUCESSO!!!")
-        pyautogui.alert(f"PLANILHA GERADA COM SUCESSO!!!")
+        pyautogui.alert(f"          PLANILHA GERADA COM SUCESSO!!!      ")
     
     print(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
-    pyautogui.alert(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
+    #pyautogui.alert(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
     label_file_dados.config(text=df_subtotais.head(12).to_string(index=False) , justify='right', width=80, height=12)
     cursor.close()
     
@@ -387,6 +407,11 @@ if __name__ == "__main__":
     try:
 
         print("\n============================== inicio ========================")
+        
+        print(f"\n{ get_exe_directory() }")
+        
+        criar_pasta_arquivos()
+        
 
         #montar interface gráfica:
         root = tk.Tk()

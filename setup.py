@@ -6,7 +6,7 @@ import sys
 from cx_Freeze import setup, Executable
 
 #Dependencies are automatically detected, but it might need fine tuning
-build_exe_options = {"packages": ["os"], "includes": ["tkinter","PIL","tkinter","pandas","numpy","warnings","pandastable","conect_BD","pyautogui","customtkinter","oracledb","datetime" , "cryptography.hazmat.primitives.kdf.pbkdf2"], 'include_files': ["LOGO_PRETA.png"]   }
+build_exe_options = {"packages": ["os"], "includes": ["tkinter","PIL","tkinter","pandas","numpy","warnings","pandastable","conect_BD","pyautogui","customtkinter","oracledb","datetime" , "cryptography.hazmat.primitives.kdf.pbkdf2" , "os"], 'include_files': ["LOGO_PRETA.png"]   }
 
 
 
