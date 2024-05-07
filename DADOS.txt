@@ -1,0 +1,22 @@
+ja trouxe:
+
+B e N
+
+FALTAM:
+AQUISAO = E.NF + E INI SD
+
+Devolução ao fornecedor = VALOR_S_DEVOL.SUM()
+
+Envio para paciente = S.PAC (É O 382.586)
+
+Devolução de paciente = E.DEVOL (16.130)
+
+Ajustes de inventário = E.INVEN - S.INVENT
+
+Emprestimos = E.3S
+
+Emprestimos para 3° = S.3S
+
+FECHAMENTO = SOMA(O300:O303)
+
+
