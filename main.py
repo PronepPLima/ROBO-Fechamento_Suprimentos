@@ -13,6 +13,7 @@ import pyautogui
 import customtkinter as ctk
 import oracledb
 import datetime
+from cryptography.hazmat.primitives.kdf import pbkdf2
 
 #ignorando alertas exibidos:
 warnings.filterwarnings("ignore")
@@ -291,11 +292,13 @@ def fech_esto_V2_detalhado(id , esquema):
     id = id
     print(f'************************** Id: {id}')
     results = cursor.execute(query, [id])
+    print(f"***** results:\n{results}")
     data_frame = pd.DataFrame(results, columns=[col[0] for col in results.description])
     print('\nAqui esta o data frame:\n')
     print(f"{data_frame.info}\n")
     #resultados inseridos num array:
-    sub_totais = {}
+    sub_totais = None
+    print(f"***************** Subtotais:\n{sub_totais}")
     print(f"\nAqui esta o SUB_TOTAIS:")
     sub_totais = {
                     (esquema +' - FECHAMENTO'): ('ID: '+ id),
@@ -312,6 +315,12 @@ def fech_esto_V2_detalhado(id , esquema):
                 }
     print(f"\nsub_totais:\n{sub_totais}")
     
+    #Inicializando o Array para começar do zero:
+    descricoes = []
+    valores = []
+    print(f"descricoes: {descricoes}")
+    print(f"valores: {descricoes}")
+    
     #Extraindo Chaves e Valores do Dicionário:
     for chave, valor in sub_totais.items():
         descricoes.append(chave)
@@ -322,8 +331,17 @@ def fech_esto_V2_detalhado(id , esquema):
     # Nomeando as colunas
     es_df_subtotais.columns = ["Descrição", "Valor"] 
     print(f"\nes_df_subtotais:\n{es_df_subtotais.info()}")
-    local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '_' + agora() + '.xlsx' )
-    #IW_PROD_ES_Resultado.xlsx
+    
+    #Salvando arquivo xlsx com Esquema:
+    #local = ('arquivos\\' + esquema + '.xlsx' )
+    local = (esquema + '.xlsx' )
+    
+    #Salvando arquivo xlsx com Esquema e ID:
+    #local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '.xlsx' )
+    
+    #Salvando arquivo xlsx com data e hora:
+    #local = ('arquivos\\' + esquema + '_' + 'ID_' + id + '_' + agora() + '.xlsx' )
+    
     print(f"\nSalvando em:\n{esquema}")
     
     with pd.ExcelWriter(local, engine='openpyxl', mode='w') as writer:
@@ -334,7 +352,7 @@ def fech_esto_V2_detalhado(id , esquema):
     #TODO:
     
     print(f"\ndata_frame.head(5):\n{data_frame.head(5)}")
-    label_file_dados.config(text=es_df_subtotais.head(12).to_string(index=False) , justify='center', width=20, height=6)
+    label_file_dados.config(text=es_df_subtotais.head(12).to_string(index=False) , justify='right', width=80, height=12)
     
 #TODO: rj_fech_esto_V2_detalhado
 
@@ -410,13 +428,13 @@ if __name__ == "__main__":
         bt_V2_fech_esto_detalh = tk.Button(root, text="Buscar Fechamento V2" , command=lambda: [ Unidade:=opcao_var.get() , Seleciona_query_Detalhe(Unidade , campo_entrada.get())])
         bt_V2_fech_esto_detalh.place(x=310,y=310)
         
-        label_file_dados = tk.Label(root,text='',border =0 , width=80 , height=12)
-        label_file_dados.place(x=250 , y=340)
+        #label_file_dados = tk.Label(root,text='',border =0 , width=80 , height=12)
+        #label_file_dados.place(x=290 , y=340)
 
         
         # Criar Label para exibir a tabela
-        label_file_dados = tk.Label(root, text="", justify="left")
-        label_file_dados.place(x=250 , y=340)
+        label_file_dados = tk.Label(root, text="")
+        label_file_dados.place(x=290 , y=340)
                
         label_rodape = tk.Label(root,text='Uso exclusivo da coordenação de suprimentos/farmácia Pronep.',border =0)
         label_rodape.place(x=453 , y=584)
