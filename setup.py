@@ -21,6 +21,5 @@ setup(
     version = "1.0",
     description = "App para extração de fechamento conforme seleção de ID e Unidade Pronep.",
     options = {"build_exe": build_exe_options},
-    executables=[Executable("main.py", base=base, icon ="icone.ico")],
-    hiddenimports=['cryptography.hazmat.primitives.kdf.pbkdf2'],
+    executables=[Executable("main.py", base=base, icon ="icone.ico")]
 )
