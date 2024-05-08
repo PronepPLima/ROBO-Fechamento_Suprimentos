@@ -377,7 +377,13 @@ def fech_esto_V2_detalhado(id , esquema):
                     'Emprestimos Mat. Enfermagem' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_E_3OS"].sum(),
                     'Emprestimos Materiais Diversos' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_E_3OS"].sum(),
                     'Emprestimos Medicamentos' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_E_3OS"].sum(),
-                    'Emprestimos ' : data_frame["VALOR_E_3OS"].sum()
+                    'Emprestimos ' : data_frame["VALOR_E_3OS"].sum(),
+                    
+                    'Emprestimos dietas para 3°' : data_frame.query('TIPOMATERIAL == "Dietas"')["VALOR_S_3OS"].sum(),
+                    'Emprestimos Mat. Enfermagem para 3°' : data_frame.query('TIPOMATERIAL == "Mat. Enfermagem"')["VALOR_S_3OS"].sum(),
+                    'Emprestimos Materiais Diversos para 3°' : data_frame.query('TIPOMATERIAL == "Materiais Diversos"')["VALOR_S_3OS"].sum(),
+                    'Emprestimos Medicamentos para 3°' : data_frame.query('TIPOMATERIAL == "Medicamentos"')["VALOR_S_3OS"].sum(),
+                    'Emprestimos para 3°' : data_frame["VALOR_S_3OS"].sum()
                 }
     print(f"\nsub_totais:\n{sub_totais}")
     #pyautogui.alert(f"{sub_totais}") 
